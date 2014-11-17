@@ -10,3 +10,12 @@ pollutantmean <- function(directory, pollutant, id = 1:332) {
     }
     mean(all_data)
 }
+
+#pollutantmean <- function(directory, pollutant, id = 1:332) {
+#    file_list <- list.files(path=directory, pattern="*.csv", full.names = TRUE)
+#    split_tables <- lapply(file_list, read.csv)
+#    data <- do.call(rbind, split_tables)
+#    fullPollutantData <- data[pollutant][id]
+#    cleanPollutantData <- fullPollutantData[!is.na(fullPollutantData)]
+#    mean(cleanPollutantData)
+#}
