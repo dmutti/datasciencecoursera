@@ -12,6 +12,12 @@
 ## makeCacheMatrix
 ## This function creates a special "matrix" object that can cache its inverse.
 makeCacheMatrix <- function(x = matrix()) {
+    if (!is.matrix(x) && is.na(x)) {
+        stop("NA not supported")
+    } else if (nrow(x) != ncol(x)) {
+        stop("only square matrices accepted")
+    }
+
     m <- NULL
     set <- function(y) {
         x <<- y
@@ -33,6 +39,9 @@ makeCacheMatrix <- function(x = matrix()) {
 ## inverse from the cache.
 ## ***This implementation assumes that the matrix supplied is always invertible.***
 cacheSolve <- function(x, ...) {
+    if (is.na(x)) {
+        stop("NA not supported")
+    }
     m <- x$getsolve()
     if(!is.null(m)) {
         message("getting cached data")
