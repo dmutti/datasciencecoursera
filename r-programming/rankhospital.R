@@ -38,6 +38,8 @@ get_hospital <- function(hospitals, num) {
         hospitals[1]
     } else if (num == "worst") {
         hospitals[length(hospitals)]
+    } else if (!is.numeric(num)) {
+        NA
     } else {
         num <- as.numeric(num)
         if (num > length(hospitals) || num < 1) {
