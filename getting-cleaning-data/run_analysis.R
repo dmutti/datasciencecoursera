@@ -10,6 +10,8 @@ run_analysis <- function(directory) {
     test_data = get_test_data(directory, features, extract_features)
 
     complete_data = rbind(train_data, test_data)
+    summary_data = aggregate(complete_data, by=list(complete_data$subject), FUN=mean)
+    summary_data[,2:length(summary_data)]
 }
 
 prepare <- function() {
