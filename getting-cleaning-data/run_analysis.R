@@ -1,3 +1,4 @@
+#write.table(run_analysis(), "c:/output.txt", col.names=FALSE, row.names=FALSE)
 run_analysis <- function() {
     prepare()
     features = read.table(paste(getwd(), "/", "features.txt", sep=""), header=FALSE, stringsAsFactors=FALSE, col.names=c("index", "name"))
