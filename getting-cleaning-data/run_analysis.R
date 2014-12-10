@@ -1,13 +1,12 @@
-#http://stackoverflow.com/questions/24715894/faster-way-to-read-fixed-width-files-in-r
-run_analysis <- function(directory) {
-    prepare
-    features = read.table(paste(directory, "/", "features.txt", sep=""), header=FALSE, stringsAsFactors=FALSE, col.names=c("index", "name"))
+run_analysis <- function() {
+    prepare()
+    features = read.table(paste(getwd(), "/", "features.txt", sep=""), header=FALSE, stringsAsFactors=FALSE, col.names=c("index", "name"))
     mean_cols = find_mean_columns(features)
     std_dev_cols = find_std_dev_columns(features)
     extract_features = c(mean_cols$index, std_dev_cols$index)
 
-    train_data = get_train_data(directory, features, extract_features)
-    test_data = get_test_data(directory, features, extract_features)
+    train_data = get_train_data(getwd(), features, extract_features)
+    test_data = get_test_data(getwd(), features, extract_features)
 
     complete_data = rbind(train_data, test_data)
     summary_data = aggregate(complete_data, by=list(complete_data$subject), FUN=mean)
