@@ -1,75 +1,45 @@
-# How the script works
+# Introduction
 
-Source: http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
+This repository describes how the script **run_analysis.R**, created as part of the requisites to complete the course "Getting and Cleaning Data".
 
-# Code book
-|Column Index | Column Data|
-|-------------|------------|
-| 01 | subject |
-| 02 | activity |
-| 03 | tBodyAcc.mean.X |
-| 04 | tBodyAcc.mean.Y |
-| 05 | tBodyAcc.mean.Z |
-| 06 | tBodyAcc.std.X |
-| 07 | tBodyAcc.std.Y |
-| 08 | tBodyAcc.std.Z |
-| 09 | tGravityAcc.mean.X |
-| 10 | tGravityAcc.mean.Y |
-| 11 | tGravityAcc.mean.Z |
-| 12 | tGravityAcc.std.X |
-| 13 | tGravityAcc.std.Y |
-| 14 | tGravityAcc.std.Z |
-| 15 | tBodyAccJerk.mean.X |
-| 16 | tBodyAccJerk.mean.Y |
-| 17 | tBodyAccJerk.mean.Z |
-| 18 | tBodyAccJerk.std.X |
-| 19 | tBodyAccJerk.std.Y |
-| 20 | tBodyAccJerk.std.Z |
-| 21 | tBodyGyro.mean.X |
-| 22 | tBodyGyro.mean.Y |
-| 23 | tBodyGyro.mean.Z |
-| 24 | tBodyGyro.std.X |
-| 25 | tBodyGyro.std.Y |
-| 26 | tBodyGyro.std.Z |
-| 27 | tBodyGyroJerk.mean.X |
-| 28 | tBodyGyroJerk.mean.Y |
-| 29 | tBodyGyroJerk.mean.Z |
-| 30 | tBodyGyroJerk.std.X |
-| 31 | tBodyGyroJerk.std.Y |
-| 32 | tBodyGyroJerk.std.Z |
-| 33 | tBodyAccMag.mean |
-| 34 | tBodyAccMag.std |
-| 35 | tGravityAccMag.mean |
-| 36 | tGravityAccMag.std |
-| 37 | tBodyAccJerkMag.mean |
-| 38 | tBodyAccJerkMag.std |
-| 39 | tBodyGyroMag.mean |
-| 40 | tBodyGyroMag.std |
-| 41 | tBodyGyroJerkMag.mean |
-| 42 | tBodyGyroJerkMag.std |
-| 43 | fBodyAcc.mean.X |
-| 44 | fBodyAcc.mean.Y |
-| 45 | fBodyAcc.mean.Z |
-| 46 | fBodyAcc.std.X |
-| 47 | fBodyAcc.std.Y |
-| 48 | fBodyAcc.std.Z |
-| 49 | fBodyAccJerk.mean.X |
-| 50 | fBodyAccJerk.mean.Y |
-| 51 | fBodyAccJerk.mean.Z |
-| 52 | fBodyAccJerk.std.X |
-| 53 | fBodyAccJerk.std.Y |
-| 54 | fBodyAccJerk.std.Z |
-| 55 | fBodyGyro.mean.X |
-| 56 | fBodyGyro.mean.Y |
-| 57 | fBodyGyro.mean.Z |
-| 58 | fBodyGyro.std.X |
-| 59 | fBodyGyro.std.Y |
-| 60 | fBodyGyro.std.Z |
-| 61 | fBodyAccMag.mean |
-| 62 | fBodyAccMag.std |
-| 63 | fBodyBodyAccJerkMag.mean |
-| 64 | fBodyBodyAccJerkMag.std |
-| 65 | fBodyBodyGyroMag.mean |
-| 66 | fBodyBodyGyroMag.std |
-| 67 | fBodyBodyGyroJerkMag.mean |
-| 68 | fBodyBodyGyroJerkMag.std |
+The script is targeted to process the "Human Activity Recognition Using Smartphones" dataset, which contains data collected from the accelerometers from the Samsung Galaxy S smartphone. An in-depth explanation is available [here](http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones) and the dataset, [here](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip).
+
+# Working Directory
+
+To execute the script, one is required to download the zip file, then extract its contents into the working directory of R (obtained calling `getwd()`). The **run_analysis.R** file must also be placed inside the working directory.
+
+In the example below, we will assume that the the result of the function `getwd()` is "c:\dev\rwd\". This way, the directory should look like the following. Folders are indicated by an ending "\". Files required by the script are surrounded by brackets.
+
+* c:\dev\rwd\
+    * run_analysis.R
+    * UCI HAR Dataset\
+        * [activity_labels.txt]
+        * [features.txt]
+        * features_info.txt
+        * README.txt
+        * test\
+            * [subject_test.txt]
+            * [X_test.txt]
+            * [y_test.txt]
+            * Inertial Signals\
+        * train\
+            * [subject_train.txt]
+            * [X_train.txt]
+            * [y_train.txt]
+            * Inertial Signals\
+
+# The Script
+
+The script does the following:
+
+1. It reads the "Human Activity Recognition Using Smartphones Data Set" from the directory `getwd()/UCI Har Dataset`;
+2. It merges the training and the test sets to create one dataset;
+3. It extracts only the measurements on the mean and standard deviation for each measurement;
+4. It gives descriptive activity names to name the activities in the dataset;
+5. It labels the dataset with descriptive variable names;
+6. It creates a second, independent tidy dataset with the average of each variable for each activity and each subject;
+7. Finally, it saves the resulting dataset as a file called `getwd()/UCI Har Dataset/tidy.txt`
+
+# Code Book
+
+The [CodeBook.md](https://github.com/dmutti/getting-cleaning-data/blob/master/CodeBook.md) file, available in this repository, offers a detailed explanation about the steps performed by the script and the resulting data and variables.

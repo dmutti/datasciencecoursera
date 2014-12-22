@@ -34,6 +34,7 @@ run_analysis <- function() {
     #remove the column "row.names"
     row.names(tidy_ordered) = NULL
     write.table(tidy_ordered, paste(root_dir, "/tidy.txt", sep=""), col.names=FALSE, row.names=FALSE)
+    tidy_ordered
 }
 
 #install and load required packages
@@ -66,7 +67,7 @@ get_data <- function(directory, subject_file, data_file, activity_file, activity
     subjects = read.table(paste(directory, subject_file, sep=""), header=FALSE, col.names=c("subject"))
     activity_labels = get_activity_data(directory, activity_file, activity_label_file)
 
-    data = laf_open_fwf(paste(directory, "/", data_file, sep=""), column_widths=rep(16, 561), column_types=rep("numeric", 561), column_names=sub("\\(\\)", "", features$name))
+    data = laf_open_fwf(paste(directory, "/", data_file, sep=""), column_widths=rep(16, 561), column_types=rep("numeric", 561), column_names=tolower(gsub("[\\(\\),-]","",features$name)))
     data = data[,]
     complete_data = filter_data(extract_features, subjects, data)
     cbind(subjects, activity_labels, complete_data)
