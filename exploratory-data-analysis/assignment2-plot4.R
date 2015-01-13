@@ -1,7 +1,7 @@
 plot4 <- function() {
     setup()
     SCC <- readRDS("./Source_Classification_Code.rds")
-    SCC <- mutate(SCC, coal = grepl("coal", tolower(as.character(SCC.Level.Four)), ignore.case = TRUE))
+    SCC <- mutate(SCC, coal = grepl("coal", tolower(as.character(Short.Name)), ignore.case = TRUE))
 
     data <- merge(SCC, NEI, by.x="SCC", by.y="SCC")
 
