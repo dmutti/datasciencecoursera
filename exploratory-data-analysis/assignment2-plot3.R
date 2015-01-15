@@ -5,8 +5,9 @@ plot3 <- function() {
     SCC <- readRDS("./Source_Classification_Code.rds")
     data <- merge(SCC, NEI, by.x="SCC", by.y="SCC")
     sum_balt <- summarize_by_fips(data, "24510")
+
     plot <- ggplot(data=sum_balt, aes(x=year, y=emissions, group=type, colour=type)) + geom_line() + geom_point() + xlab("Year") + ylab("Total PM2.5 Emissions (tons)") + ggtitle("Baltimore, Maryland") + scale_colour_hue(name="Source")
-    ggsave(filename = "./assignment2-plot3.png", plot = plot)
+    ggsave(filename = "./assignment2-plot3.png", plot = plot, width = 4.2, height = 4.2, dpi = 100)
 }
 
 setup <- function() {
