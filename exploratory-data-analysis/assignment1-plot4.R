@@ -40,12 +40,6 @@ plot44 <- function(hhpc) {
 
 set_up <- function() {
     Sys.setlocale("LC_TIME", "English")
-    if (length(grep("lubridate", installed.packages(), fixed=TRUE)) == 0) {
-        install.packages("lubridate")
-    }
-    if (length(grep("dplyr", installed.packages(), fixed=TRUE)) == 0) {
-        install.packages("dplyr")
-    }
     library(lubridate)
     library(dplyr)
 }

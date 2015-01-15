@@ -19,8 +19,5 @@ setup <- function() {
     if (!exists("NEI", envir = .GlobalEnv)) {
         assign("NEI", readRDS("./summarySCC_PM25.rds"), envir = .GlobalEnv)
     }
-    if (length(grep("dplyr", installed.packages(), fixed=TRUE)) == 0) {
-        install.packages("dplyr")
-    }
     library(dplyr)
 }

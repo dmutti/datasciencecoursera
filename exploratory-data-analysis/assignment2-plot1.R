@@ -20,8 +20,5 @@ setup <- function() {
         data <- merge(SCC, NEI, by.x="SCC", by.y="SCC")
         assign("data", data, envir = .GlobalEnv)
     }
-    if (length(grep("dplyr", installed.packages(), fixed=TRUE)) == 0) {
-        install.packages("dplyr")
-    }
     library(dplyr)
 }

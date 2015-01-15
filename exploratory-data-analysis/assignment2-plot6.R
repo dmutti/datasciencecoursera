@@ -22,14 +22,11 @@ setup <- function() {
     if (!exists("NEI", envir = .GlobalEnv)) {
         assign("NEI", readRDS("./summarySCC_PM25.rds"), envir = .GlobalEnv)
     }
-    if (length(grep("dplyr", installed.packages(), fixed=TRUE)) == 0) {
-        install.packages("dplyr")
-    }
     library(dplyr)
 }
 
 summarize_by_fips <- function(full_data, code){
     filtered <- filter(full_data, motorvehicle == TRUE & fips == code)
     grouped <- group_by(select(filtered, Emissions, year), year)
-    summarize(grouped_motor, sum(Emissions))
+    summarize(grouped, sum(Emissions))
 }
