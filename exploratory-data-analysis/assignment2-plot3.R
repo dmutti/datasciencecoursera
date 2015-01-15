@@ -1,12 +1,11 @@
+#http://www.cookbook-r.com/Graphs/Bar_and_line_graphs_(ggplot2)/
 plot3 <- function() {
     setup()
     SCC <- readRDS("./Source_Classification_Code.rds")
     data <- merge(SCC, NEI, by.x="SCC", by.y="SCC")
     sum_balt <- summarize_by_fips(data, "24510")
-    png("./assignment2-plot3.png", width = 480, height = 480, units = "px")
-    par(bg = "transparent")
-    ggplot(data=sum_balt, aes(x=year, y=emissions, group=type, colour=type)) + geom_line() + geom_point()
-    dev.off()
+    plot <- ggplot(data=sum_balt, aes(x=year, y=emissions, group=type, colour=type)) + geom_line() + geom_point() + xlab("Year") + ylab("Total PM2.5 Emissions (tons)") + ggtitle("Baltimore, Maryland") + scale_colour_hue(name="Source")
+    ggsave(filename = "./assignment2-plot3.png", plot = plot)
 }
 
 setup <- function() {
