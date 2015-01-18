@@ -6,11 +6,12 @@ plot3 <- function() {
     data <- merge(SCC, NEI, by.x="SCC", by.y="SCC")
     sum_balt <- summarize_by_fips(data, "24510")
 
-    plot <- ggplot(data=sum_balt, aes(x=year, y=emissions, group=type, colour=type)) + geom_line() + geom_point() + xlab("Year") + ylab("Total PM2.5 Emissions (tons)") + ggtitle("Baltimore, Maryland") + scale_colour_hue(name="Source")
+    png("./assignment2-plot3.png", width = 480, height = 480, units = "px")
+    print(ggplot(data=sum_balt, aes(x=year, y=emissions, group=type, colour=type)) + geom_line() + geom_point() + xlab("Year") + ylab("Total PM2.5 Emissions (tons)") + ggtitle("Baltimore, Maryland") + scale_colour_hue(name="Source"))
     #qplot(year, emissions, data = sum_balt, color = type)
     #qplot(year, emissions, data = sum_balt, facets = .~type, color = type) #facets: lhs=rows, rhs=columns, "." there is only one row
     #qplot(year, emissions, data = sum_balt, shape = type, color = type)
-    ggsave(filename = "./assignment2-plot3.png", plot = plot, width = 4.2, height = 4.2, dpi = 100)
+    dev.off
 }
 
 setup <- function() {
@@ -26,7 +27,5 @@ summarize_by_fips <- function(full_data, code){
     grouped <- group_by(select(filtered, type, Emissions, year), type, year)
     result <- summarize(grouped, sum(Emissions))
     names(result) <- c("type", "year", "emissions")
-    result$type <- factor(result$type)
-    result$year <- factor(result$year)
     result
 }
