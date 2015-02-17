@@ -24,7 +24,7 @@ Data Processing
 
 The dataset is available [here](`r url`) in the form of a comma-separated-value file, compressed via the bzip2 algorithm to reduce its size.
 
-The dataset is downloaded from the aforementioned website in the working directory and read into the `noaa` variable.
+The dataset is downloaded from the aforementioned website in the working directory and read into the `noaa` variable. For purposes of accelerating the generation of this report, the original file is parsed with `read.table` if no **`r bfile`** exists. The reason is that using a binary format provides better performance and smaller size.
 
 ```{r}
 if (!file.exists(bfile)) {
