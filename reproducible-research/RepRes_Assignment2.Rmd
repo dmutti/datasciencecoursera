@@ -1,7 +1,6 @@
-Assessment of economic and population impact of weather events using the NOAA Storm Database
-============================================================================================
+# Assessment of economic and population impact of weather events using the NOAA Storm Database
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE}
 cfile <- "./repdata-data-StormData.csv.bz2"
 bfile <- "./repdata-data-StormData.rds"
 url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
@@ -19,8 +18,7 @@ The analysis of the NOAA Storm Database allowed us to conclude that...
 Immediately after the title, there should be a synopsis which describes and summarizes your analysis in at most 10 complete sentences.
 -->
 
-Data Processing
----------------
+## Data Processing
 
 The dataset is available [here](`r url`) in the form of a comma-separated-value file, compressed via the bzip2 algorithm to reduce its size.
 
@@ -31,15 +29,32 @@ if (!file.exists(bfile)) {
     if (!file.exists(cfile)) {
         download.file(url = url, destfile = cfile, method = "curl")
     }
-    csv <- read.table(bzfile(cfile), header = TRUE, stringsAsFactors = FALSE, sep = ",", quote = "\"")
+    csv <- read.table(bzfile(cfile), header = TRUE, stringsAsFactors = TRUE, na.strings = "NA", sep = ",", quote = "\"")
     saveRDS(csv, bfile)
 }
 noaa <- readRDS(bfile)
-head(noaa)
+#noaa <- read.table("./head_open-repdata-data-StormData.csv", header = TRUE, stringsAsFactors = TRUE, sep = ",", quote = "\"")
 ```
+
+In what follows, we will develop and present the code necessary to address the questions that were previously listed.
+
+#### Q1 -- Across the United States, which types of events are most harmful with respect to population health?
+
+```{r}
+event_types <- levels(noaa$EVTYPE)
+```
+
+According to the [storm data documentation](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf), the `EVTYPE` variable denotes the types of weather events that happened across the United States. In this article, we will take into consideration the sum of the number of fatalities (`noaa$FATALITIES`) and the number of injuries (`noaa$INJURIES`) as a means to order which events were most harmful with respect to population health. Since there are `r length(event_types)` distinct types of events in the database, we will take the first 20 most harmful events.
+
+```{r}
+noaa_health_impact <- noaa[c("EVTYPE", "INJURIES", "FATALITIES")]
+noaa_health_impact$IMPACT <- noaa_health_impact$INJURIES + noaa_health_impact$FATALITIES
+noaa_health_total_impact <- aggregate(IMPACT ~ EVTYPE, data = noaa_health_impact, FUN = sum)
+head(noaa_health_total_impact[order(-noaa_health_total_impact[,2]),], 20)
+```
+
 <!--
 There should be a section titled Data Processing which describes (in words and code) how the data were loaded into R and processed for analysis. In particular, your analysis must start from the raw CSV file containing the data. You cannot do any preprocessing outside the document.
 -->
 
-Results
--------
+## Results
