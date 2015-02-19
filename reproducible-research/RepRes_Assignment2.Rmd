@@ -1,6 +1,7 @@
 # Assessment of economic and population impact of weather events using the NOAA Storm Database
 
 ```{r, echo = FALSE, warning = FALSE}
+library(dplyr)
 cfile <- "./repdata-data-StormData.csv.bz2"
 bfile <- "./repdata-data-StormData.rds"
 url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
@@ -47,14 +48,37 @@ event_types <- levels(noaa$EVTYPE)
 According to the [storm data documentation](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf), the `EVTYPE` variable denotes the types of weather events that happened across the United States. In this article, we will take into consideration the sum of the number of fatalities (`noaa$FATALITIES`) and the number of injuries (`noaa$INJURIES`) as a means to order which events were most harmful with respect to population health. Since there are `r length(event_types)` distinct types of events in the database, we will take the first 20 most harmful events.
 
 ```{r}
-noaa_health_impact <- noaa[c("EVTYPE", "INJURIES", "FATALITIES")]
-noaa_health_impact$IMPACT <- noaa_health_impact$INJURIES + noaa_health_impact$FATALITIES
-noaa_health_total_impact <- aggregate(IMPACT ~ EVTYPE, data = noaa_health_impact, FUN = sum)
-head(noaa_health_total_impact[order(-noaa_health_total_impact[,2]),], 20)
+noaa_health_impact <- noaa %>%
+                          select(EVTYPE, FATALITIES, INJURIES) %>%
+                          group_by(type = EVTYPE) %>% 
+                          summarise(fatalities = sum(FATALITIES), injuries = sum(INJURIES)) %>%
+                          arrange(desc(fatalities, injuries)) %>%
+                          head(20)
+noaa_health_impact
 ```
 
-<!--
-There should be a section titled Data Processing which describes (in words and code) how the data were loaded into R and processed for analysis. In particular, your analysis must start from the raw CSV file containing the data. You cannot do any preprocessing outside the document.
+```{r}
+damage_calc <- function(number, exp = "") {
+    if (exp %in% c("", "-", "?", "+")) return(number)
+    if (exp %in% c("H", "h")) return(number * 10^2)
+    if (exp %in% c("k", "K")) return(number * 10^3)
+    if (exp %in% c("m", "M")) return(number * 10^6)
+    if (exp %in% c("B", "b")) return(number * 10^9)
+    return(number * 10^exp)
+}
+
+levels(noaa$PROPDMGEXP) <- c(10^0, 10^0, 10^0, 10^0, 10^0, 10^1, 10^2, 10^3, 10^4, 10^5, 10^6, 10^7, 10^8, 10^9, 10^2, 10^2, 10^3, 10^6, 10^6)
+levels(noaa$CROPDMGEXP) <- c(10^0, 10^0, 10^0, 10^2, 10^9, 10^3, 10^3, 10^6, 10^6)
+noaa_economic_impact <- noaa %>%
+                            select(EVTYPE, PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP) %>%
+                            mutate(damage = (PROPDMG * as.integer(PROPDMGEXP)) + (CROPDMG * as.integer(CROPDMGEXP))) %>%
+                            group_by(type = EVTYPE) %>%
+                            summarise(damage = sum(damage)) %>%
+                            arrange(desc(damage)) %>%
+                            head(20)
+noaa_economic_impact
+```
+
 -->
 
 ## Results
