@@ -1,7 +1,7 @@
-# Assessment of economic and population impact of weather events using the NOAA Storm Database
+# Assessment of economic and population impacts of weather events using the NOAA Storm Database
 
-```{r, echo = FALSE}
-knitr::opts_chunk$set(fig.path='figure/', fig.width = 10, fig.height = 6, dpi = 144)
+```{r}
+knitr::opts_chunk$set(fig.path='figure/', fig.width = 9, fig.height = 6, dpi = 144)
 
 library(dplyr, warn.conflicts = FALSE)
 library(ggplot2, warn.conflicts = FALSE)
@@ -20,7 +20,7 @@ The U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database
 
 This article aims at addressing two questions about weather events that happened in the US: a) "which ones are most harmful with respect to population health?"; and b) "which ones have the greatest economic consequences?".
 
-The analysis of the NOAA Storm Database allowed us to conclude that...
+The analysis of the NOAA Storm Database allowed us to conclude that **FLOODS** are the most economically harmful weather events, while **TORNADOES** are the most dangerous to human lives.
 
 ## Data Processing
 
@@ -57,8 +57,10 @@ noaa_health_impact <- noaa %>%
                           arrange(desc(fatalities, injuries)) %>%
                           slice(1:20) %>%
                           mutate(type = factor(type, rev(as.character(type))))
+
 noaa_health_impact
-ggplot(melt(noaa_health_impact, id.var = "type"), aes(x = type, y = value, fill = variable)) + geom_bar(stat = "identity") + coord_flip() + xlab("Severe Weather Event") + ylab("Health Impact (Fatalities + Injuries)") + ggtitle("Public Health Consequences") + scale_fill_manual(values = c("#FF0000", "#FF9912"), name ="Impact", labels=c("Fatalities", "Injuries"))
+
+ggplot(melt(noaa_health_impact, id.var = "type"), aes(x = type, y = value, fill = variable)) + geom_bar(stat = "identity") + coord_flip() + scale_y_continuous(labels = comma) + xlab("Severe Weather Event") + ylab("Health Impact (Fatalities + Injuries)") + ggtitle("Public Health Consequences") + scale_fill_manual(values = c("#FF0000", "#FF9912"), name ="Impact", labels=c("Fatalities", "Injuries"))
 ```
 
 #### Q2 -- Across the United States, which types of events have the greatest economic consequences?
@@ -80,7 +82,9 @@ value_calc <- function(number = 0, exp = "") {
     if (exp %in% c("B", "b")) return(number * 10^9)
     return(number * 10^as.integer(exp))
 }
+
 noaa$DAMAGE <- apply(noaa, 1, damage_calc)
+
 noaa_economic_impact <- noaa %>%
                             select(EVTYPE, DAMAGE) %>%
                             group_by(type = EVTYPE) %>% 
@@ -88,11 +92,33 @@ noaa_economic_impact <- noaa %>%
                             arrange(desc(damage)) %>%
                             slice(1:20) %>%
                             mutate(type = factor(type, rev(as.character(type))))
+
 noaa_economic_impact
+
 ggplot(noaa_economic_impact, aes(x = type, y = damage, fill = type)) + geom_bar(stat = "identity") + scale_fill_manual(values = colorRampPalette(brewer.pal(5,"YlOrRd"))(20)) + coord_flip() + scale_y_continuous(labels = comma) + xlab("Severe Weather Event") + ylab("Damages (US$)") + ggtitle("Economic Consequences") + guides(fill = FALSE)
 ```
 
 
 ## Results
 
-...
+```{r}
+top_events <- as.factor(unique(c(head(as.character(noaa_economic_impact$type), 5), head(as.character(noaa_health_impact$type), 5))))
+
+noaa_most_harmful <- noaa %>%
+                    filter(EVTYPE %in% top_events) %>%
+                    select(type = EVTYPE) %>%
+                    mutate(count = 1) %>%
+                    group_by(type) %>%
+                    summarise(total = sum(count)) %>%
+                    arrange(desc(total)) %>%
+                    slice(1:5) %>%
+                    mutate(type = factor(type, rev(as.character(type))))
+
+noaa_most_harmful
+
+ggplot(noaa_most_harmful, aes(x = type, y = total, fill = type)) + geom_bar(stat = "identity") + scale_fill_brewer(palette = "Paired") + coord_flip() + scale_y_continuous(labels = comma) + xlab("Severe Weather Event") + ylab("Frequency") + ggtitle("Most Harmful Occurring Events") + guides(fill = FALSE)
+```
+
+In this article, we analysed the NOAA Storm Database in order to assess the economic and population impacts of severe weather events. To evaluate the economic aspect, this article took into consideration the sum of damages caused to properties and crops, represented by two pairs of columns `{(PROPDMG,PROPDMGEXP), (CROPDMG,CROPDMGEXP)}`. Public health impact was measured in terms of fatalities and injuries, represented by `{FATALITIES, INJURIES}` columns, respectively. The idea is that events were ordered in descending order, first by the number of fatalities followed by the number of injuries.
+
+Our data allow us to conclude that **FLOODS** are the most harmful weather events from an economical point of view, with losses surpassing US$ 150 billion dollars; from a public health perspective, **TORNADOES** are the most harmful events, causing a total of 5633 fatalities and 91346 injuries. The top 5 most harmful ocurring events are `r noaa_most_harmful$type`.
