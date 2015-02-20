@@ -1,6 +1,8 @@
 # Assessment of economic and population impact of weather events using the NOAA Storm Database
 
 ```{r, echo = FALSE}
+knitr::opts_chunk$set(fig.path='figure/', fig.width = 10, fig.height = 6, dpi = 144)
+
 library(dplyr, warn.conflicts = FALSE)
 library(ggplot2, warn.conflicts = FALSE)
 library(RColorBrewer, warn.conflicts = FALSE)
@@ -56,6 +58,7 @@ noaa_health_impact <- noaa %>%
                           slice(1:20) %>%
                           mutate(type = factor(type, rev(as.character(type))))
 noaa_health_impact
+ggplot(melt(noaa_health_impact, id.var = "type"), aes(x = type, y = value, fill = variable)) + geom_bar(stat = "identity") + coord_flip() + xlab("Severe Weather Event") + ylab("Health Impact (Fatalities + Injuries)") + ggtitle("Public Health Consequences") + scale_fill_manual(values = c("#FF0000", "#FF9912"), name ="Impact", labels=c("Fatalities", "Injuries"))
 ```
 
 #### Q2 -- Across the United States, which types of events have the greatest economic consequences?
@@ -86,13 +89,10 @@ noaa_economic_impact <- noaa %>%
                             slice(1:20) %>%
                             mutate(type = factor(type, rev(as.character(type))))
 noaa_economic_impact
+ggplot(noaa_economic_impact, aes(x = type, y = damage, fill = type)) + geom_bar(stat = "identity") + scale_fill_manual(values = colorRampPalette(brewer.pal(5,"YlOrRd"))(20)) + coord_flip() + scale_y_continuous(labels = comma) + xlab("Severe Weather Event") + ylab("Damages (US$)") + ggtitle("Economic Consequences") + guides(fill = FALSE)
 ```
 
 
 ## Results
 
-```{r}
-ggplot(melt(noaa_health_impact, id.var = "type"), aes(x = type, y = value, fill = variable)) + geom_bar(stat = "identity") + coord_flip() + xlab("Severe Weather Event") + ylab("Health Impact (Fatalities + Injuries)") + ggtitle("Public Health Consequences") + scale_fill_manual(values = c("#FF0000", "#FF9912"), name ="Impact", labels=c("Fatalities", "Injuries"))
-
-ggplot(noaa_economic_impact, aes(x = type, y = damage, fill = type)) + geom_bar(stat = "identity") + scale_fill_manual(values = colorRampPalette(brewer.pal(5,"YlOrRd"))(20)) + coord_flip() + scale_y_continuous(labels = comma) + xlab("Severe Weather Event") + ylab("Damages (US$)") + ggtitle("Economic Consequences") + guides(fill = FALSE)
-```
+...
