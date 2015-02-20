@@ -1,7 +1,12 @@
 # Assessment of economic and population impact of weather events using the NOAA Storm Database
 
-```{r, echo = FALSE, warning = FALSE}
+```{r, echo = FALSE}
 library(dplyr, warn.conflicts = FALSE)
+library(ggplot2, warn.conflicts = FALSE)
+library(RColorBrewer, warn.conflicts = FALSE)
+library(reshape2, warn.conflicts = FALSE)
+library(scales, warn.conflicts = FALSE)
+
 cfile <- "./repdata-data-StormData.csv.bz2"
 bfile <- "./repdata-data-StormData.rds"
 url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
@@ -14,10 +19,6 @@ The U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database
 This article aims at addressing two questions about weather events that happened in the US: a) "which ones are most harmful with respect to population health?"; and b) "which ones have the greatest economic consequences?".
 
 The analysis of the NOAA Storm Database allowed us to conclude that...
-
-<!--
-Immediately after the title, there should be a synopsis which describes and summarizes your analysis in at most 10 complete sentences.
--->
 
 ## Data Processing
 
@@ -52,7 +53,8 @@ noaa_health_impact <- noaa %>%
                           group_by(type = EVTYPE) %>% 
                           summarise(fatalities = sum(FATALITIES), injuries = sum(INJURIES)) %>%
                           arrange(desc(fatalities, injuries)) %>%
-                          head(20)
+                          slice(1:20) %>%
+                          mutate(type = factor(type, rev(as.character(type))))
 noaa_health_impact
 ```
 
@@ -81,9 +83,16 @@ noaa_economic_impact <- noaa %>%
                             group_by(type = EVTYPE) %>% 
                             summarise(damage = sum(DAMAGE)) %>%
                             arrange(desc(damage)) %>%
-                            head(20)
+                            slice(1:20) %>%
+                            mutate(type = factor(type, rev(as.character(type))))
 noaa_economic_impact
 ```
 
 
 ## Results
+
+```{r}
+ggplot(melt(noaa_health_impact, id.var = "type"), aes(x = type, y = value, fill = variable)) + geom_bar(stat = "identity") + coord_flip() + xlab("Severe Weather Event") + ylab("Health Impact (Fatalities + Injuries)") + ggtitle("Public Health Consequences") + scale_fill_manual(values = c("#FF0000", "#FF9912"), name ="Impact", labels=c("Fatalities", "Injuries"))
+
+ggplot(noaa_economic_impact, aes(x = type, y = damage, fill = type)) + geom_bar(stat = "identity") + scale_fill_manual(values = colorRampPalette(brewer.pal(5,"YlOrRd"))(20)) + coord_flip() + scale_y_continuous(labels = comma) + xlab("Severe Weather Event") + ylab("Damages (US$)") + ggtitle("Economic Consequences") + guides(fill = FALSE)
+```
