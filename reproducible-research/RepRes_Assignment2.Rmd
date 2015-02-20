@@ -15,6 +15,9 @@ This article aims at addressing two questions about weather events that happened
 
 The analysis of the NOAA Storm Database allowed us to conclude that...
 
+<!--
+Immediately after the title, there should be a synopsis which describes and summarizes your analysis in at most 10 complete sentences.
+-->
 
 ## Data Processing
 
@@ -46,7 +49,7 @@ According to the [storm data documentation](https://d396qusza40orc.cloudfront.ne
 ```{r}
 noaa_health_impact <- noaa %>%
                           select(EVTYPE, FATALITIES, INJURIES) %>%
-                          group_by(type = EVTYPE) %>%
+                          group_by(type = EVTYPE) %>% 
                           summarise(fatalities = sum(FATALITIES), injuries = sum(INJURIES)) %>%
                           arrange(desc(fatalities, injuries)) %>%
                           head(20)
@@ -72,15 +75,15 @@ value_calc <- function(number = 0, exp = "") {
     if (exp %in% c("B", "b")) return(number * 10^9)
     return(number * 10^as.integer(exp))
 }
-noaa$DAMAGE <- c(rep(0, nrow(noaa)))
 noaa$DAMAGE <- apply(noaa, 1, damage_calc)
 noaa_economic_impact <- noaa %>%
                             select(EVTYPE, DAMAGE) %>%
-                            group_by(type = EVTYPE) %>%
+                            group_by(type = EVTYPE) %>% 
                             summarise(damage = sum(DAMAGE)) %>%
                             arrange(desc(damage)) %>%
                             head(20)
 noaa_economic_impact
 ```
+
 
 ## Results
