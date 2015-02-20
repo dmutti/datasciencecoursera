@@ -1,7 +1,7 @@
 # Assessment of economic and population impact of weather events using the NOAA Storm Database
 
 ```{r, echo = FALSE, warning = FALSE}
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 cfile <- "./repdata-data-StormData.csv.bz2"
 bfile <- "./repdata-data-StormData.rds"
 url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
@@ -15,9 +15,6 @@ This article aims at addressing two questions about weather events that happened
 
 The analysis of the NOAA Storm Database allowed us to conclude that...
 
-<!--
-Immediately after the title, there should be a synopsis which describes and summarizes your analysis in at most 10 complete sentences.
--->
 
 ## Data Processing
 
@@ -34,7 +31,6 @@ if (!file.exists(bfile)) {
     saveRDS(csv, bfile)
 }
 noaa <- readRDS(bfile)
-#noaa <- read.table("./head_open-repdata-data-StormData.csv", header = TRUE, stringsAsFactors = TRUE, sep = ",", quote = "\"")
 ```
 
 In what follows, we will develop and present the code necessary to address the questions that were previously listed.
@@ -50,35 +46,41 @@ According to the [storm data documentation](https://d396qusza40orc.cloudfront.ne
 ```{r}
 noaa_health_impact <- noaa %>%
                           select(EVTYPE, FATALITIES, INJURIES) %>%
-                          group_by(type = EVTYPE) %>% 
+                          group_by(type = EVTYPE) %>%
                           summarise(fatalities = sum(FATALITIES), injuries = sum(INJURIES)) %>%
                           arrange(desc(fatalities, injuries)) %>%
                           head(20)
 noaa_health_impact
 ```
 
+#### Q2 -- Across the United States, which types of events have the greatest economic consequences?
+
+Estimate economic consequences were measured in dollars (`noaa$PROPDMG` and `noaa$CROPDMG`), and its value rounded to three significant digits, followed by an alphabetical character signifying the magnitude of the number (`noaa$PROPDMGEXP` and `noaa$CROPDMGEXP`), i.e., 1.55B for $1,550,000,000. Alphabetical characters used to signify magnitude include "K" for thousands, "M" for millions, and "B" for billions. In order to get an accurate value, these tuples(`DMG, DMGEXP`) must be decoded and converted into plain values. The task is performed by `value_calc` function (which does the calculation), and `damage_calc` (which sums the two kinds of damages).
+
 ```{r}
-damage_calc <- function(number, exp = "") {
+damage_calc <- function(row) {
+    prop <- value_calc(as.numeric(row["PROPDMG"]), as.character(row["PROPDMGEXP"]))
+    crop <- value_calc(as.numeric(row["CROPDMG"]), as.character(row["CROPDMGEXP"]))
+    return(prop + crop)
+}
+
+value_calc <- function(number = 0, exp = "") {
     if (exp %in% c("", "-", "?", "+")) return(number)
     if (exp %in% c("H", "h")) return(number * 10^2)
     if (exp %in% c("k", "K")) return(number * 10^3)
     if (exp %in% c("m", "M")) return(number * 10^6)
     if (exp %in% c("B", "b")) return(number * 10^9)
-    return(number * 10^exp)
+    return(number * 10^as.integer(exp))
 }
-
-levels(noaa$PROPDMGEXP) <- c(10^0, 10^0, 10^0, 10^0, 10^0, 10^1, 10^2, 10^3, 10^4, 10^5, 10^6, 10^7, 10^8, 10^9, 10^2, 10^2, 10^3, 10^6, 10^6)
-levels(noaa$CROPDMGEXP) <- c(10^0, 10^0, 10^0, 10^2, 10^9, 10^3, 10^3, 10^6, 10^6)
+noaa$DAMAGE <- c(rep(0, nrow(noaa)))
+noaa$DAMAGE <- apply(noaa, 1, damage_calc)
 noaa_economic_impact <- noaa %>%
-                            select(EVTYPE, PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP) %>%
-                            mutate(damage = (PROPDMG * as.integer(PROPDMGEXP)) + (CROPDMG * as.integer(CROPDMGEXP))) %>%
+                            select(EVTYPE, DAMAGE) %>%
                             group_by(type = EVTYPE) %>%
-                            summarise(damage = sum(damage)) %>%
+                            summarise(damage = sum(DAMAGE)) %>%
                             arrange(desc(damage)) %>%
                             head(20)
 noaa_economic_impact
 ```
-
--->
 
 ## Results
