@@ -13,6 +13,8 @@ library(lubridate, warn.conflicts = FALSE)
 cfile <- "./repdata-data-StormData.csv.bz2"
 bfile <- "./repdata-data-StormData.rds"
 url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
+
+max <- 10
 ```
 
 Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.
@@ -56,7 +58,7 @@ noaa_health_impact <- noaa %>%
                           group_by(type = EVTYPE) %>% 
                           summarise(fatalities = sum(FATALITIES), injuries = sum(INJURIES)) %>%
                           arrange(desc(fatalities, injuries)) %>%
-                          slice(1:10) %>%
+                          slice(1:max) %>%
                           mutate(type = factor(type, rev(as.character(type))))
 
 noaa_health_impact
@@ -70,18 +72,17 @@ Estimate economic consequences were measured in dollars (`noaa$PROPDMG` and `noa
 
 ```{r}
 damage_calc <- function(row) {
+    value_calc <- function(number = 0, exp = "") {
+        if (exp %in% c("", "-", "?", "+")) return(number)
+        if (exp %in% c("H", "h")) return(number * 10^2)
+        if (exp %in% c("k", "K")) return(number * 10^3)
+        if (exp %in% c("m", "M")) return(number * 10^6)
+        if (exp %in% c("B", "b")) return(number * 10^9)
+        return(number * 10^as.integer(exp))
+    }
     prop <- value_calc(as.numeric(row["PROPDMG"]), as.character(row["PROPDMGEXP"]))
     crop <- value_calc(as.numeric(row["CROPDMG"]), as.character(row["CROPDMGEXP"]))
     return(prop + crop)
-}
-
-value_calc <- function(number = 0, exp = "") {
-    if (exp %in% c("", "-", "?", "+")) return(number)
-    if (exp %in% c("H", "h")) return(number * 10^2)
-    if (exp %in% c("k", "K")) return(number * 10^3)
-    if (exp %in% c("m", "M")) return(number * 10^6)
-    if (exp %in% c("B", "b")) return(number * 10^9)
-    return(number * 10^as.integer(exp))
 }
 
 noaa$DAMAGE <- apply(noaa, 1, damage_calc)
@@ -91,12 +92,12 @@ noaa_economic_impact <- noaa %>%
                             group_by(type = EVTYPE) %>% 
                             summarise(damage = sum(DAMAGE)) %>%
                             arrange(desc(damage)) %>%
-                            slice(1:10) %>%
+                            slice(1:max) %>%
                             mutate(type = factor(type, rev(as.character(type))))
 
 noaa_economic_impact
 
-ggplot(noaa_economic_impact, aes(x = type, y = damage, fill = type)) + geom_bar(stat = "identity") + scale_fill_manual(values = colorRampPalette(brewer.pal(5,"YlOrRd"))(20)) + coord_flip() + scale_y_continuous(labels = comma) + xlab("Severe Weather Event") + ylab("Damages (US$)") + ggtitle("Economic Consequences") + guides(fill = FALSE)
+ggplot(noaa_economic_impact, aes(x = type, y = damage, fill = type)) + geom_bar(stat = "identity") + scale_fill_manual(values = colorRampPalette(brewer.pal(5,"Reds"))(max)) + coord_flip() + scale_y_continuous(labels = comma) + xlab("Severe Weather Event") + ylab("Damages (US$)") + ggtitle("Economic Consequences") + guides(fill = FALSE)
 ```
 
 
