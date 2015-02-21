@@ -1,7 +1,7 @@
 # Assessment of economic and population impacts of weather events using the NOAA Storm Database
 
 ```{r}
-knitr::opts_chunk$set(fig.path='figure/', fig.width = 9, fig.height = 6, dpi = 144)
+knitr::opts_chunk$set(fig.path = "figure/", cache.path = "cache/", fig.width = 9, fig.height = 6, dpi = 144)
 
 library(dplyr, warn.conflicts = FALSE)
 library(ggplot2, warn.conflicts = FALSE)
@@ -9,6 +9,7 @@ library(RColorBrewer, warn.conflicts = FALSE)
 library(reshape2, warn.conflicts = FALSE)
 library(scales, warn.conflicts = FALSE)
 library(lubridate, warn.conflicts = FALSE)
+library(stringr, warn.conflicts = FALSE)
 
 cfile <- "./repdata-data-StormData.csv.bz2"
 bfile <- "./repdata-data-StormData.rds"
@@ -27,19 +28,18 @@ The analysis of the NOAA Storm Database allowed us to conclude that **FLOODS** a
 
 ## Data Processing
 
-The dataset is available [here](`r url`) in the form of a comma-separated-value file, compressed via the bzip2 algorithm to reduce its size.
+The dataset is available [here](`r url`) in the form of a comma-separated-value file, compressed via the bzip2 algorithm to reduce its size. The dataset is downloaded from the aforementioned website in the working directory and read into the `noaa` variable.
 
-The dataset is downloaded from the aforementioned website in the working directory and read into the `noaa` variable. For purposes of accelerating the generation of this report, the original file is parsed with `read.table` if no **`r bfile`** exists. The reason is that using a binary format provides better performance and smaller size.
-
-```{r}
+```{r, cache = TRUE}
 if (!file.exists(bfile)) {
     if (!file.exists(cfile)) {
         download.file(url = url, destfile = cfile, method = "curl")
     }
-    csv <- read.table(bzfile(cfile), header = TRUE, stringsAsFactors = TRUE, na.strings = "NA", sep = ",", quote = "\"")
-    saveRDS(csv, bfile)
+    noaa <- read.table(bzfile(cfile), header = TRUE, stringsAsFactors = FALSE, na.strings = "NA", sep = ",", quote = "\"")
+    noaa <- noaa %>%
+                select(EVTYPE, FATALITIES, INJURIES, PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP, BGN_DATE) %>%
+                mutate(EVTYPE = str_trim(toupper(EVTYPE)))
 }
-noaa <- readRDS(bfile)
 ```
 
 In what follows, we will develop and present the code necessary to address the questions that were previously listed.
@@ -47,19 +47,19 @@ In what follows, we will develop and present the code necessary to address the q
 #### Q1 -- Across the United States, which types of events are most harmful with respect to population health?
 
 ```{r}
-event_types <- levels(noaa$EVTYPE)
+event_types <- levels(as.factor(noaa$EVTYPE))
 ```
 
-According to the [storm data documentation](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf), the `EVTYPE` variable denotes the types of weather events that happened across the United States. In this article, we will take into consideration the sum of the number of fatalities (`noaa$FATALITIES`) and the number of injuries (`noaa$INJURIES`) as a means to order which events were most harmful with respect to population health. Since there are `r length(event_types)` distinct types of events in the database, we will take the first 20 most harmful events.
+According to the [storm data documentation](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf), the `EVTYPE` variable denotes the types of weather events that happened across the United States. In this article, we will take into consideration the sum of the number of fatalities (`noaa$FATALITIES`) and the number of injuries (`noaa$INJURIES`) as a means to order which events were most harmful with respect to population health. Since there are `r length(event_types)` distinct types of events in the database, we will select the first `r max` most harmful events.
 
-```{r}
+```{r, cache = TRUE}
 noaa_health_impact <- noaa %>%
                           select(EVTYPE, FATALITIES, INJURIES) %>%
                           group_by(type = EVTYPE) %>% 
                           summarise(fatalities = sum(FATALITIES), injuries = sum(INJURIES)) %>%
                           arrange(desc(fatalities, injuries)) %>%
                           slice(1:max) %>%
-                          mutate(type = factor(type, rev(as.character(type))))
+                          mutate(type = factor(type, rev(type)))
 
 noaa_health_impact
 
@@ -68,9 +68,9 @@ ggplot(melt(noaa_health_impact, id.var = "type"), aes(x = type, y = value, fill 
 
 #### Q2 -- Across the United States, which types of events have the greatest economic consequences?
 
-Estimate economic consequences were measured in dollars (`noaa$PROPDMG` and `noaa$CROPDMG`), and its value rounded to three significant digits, followed by an alphabetical character signifying the magnitude of the number (`noaa$PROPDMGEXP` and `noaa$CROPDMGEXP`), i.e., 1.55B for $1,550,000,000. Alphabetical characters used to signify magnitude include "K" for thousands, "M" for millions, and "B" for billions. In order to get an accurate value, these tuples(`DMG, DMGEXP`) must be decoded and converted into plain values. The task is performed by `value_calc` function (which does the calculation), and `damage_calc` (which sums the two kinds of damages).
+Estimate economic consequences were measured in dollars (`noaa$PROPDMG` and `noaa$CROPDMG`), and its value rounded to three significant digits, followed by an alphabetical character signifying the magnitude of the number (`noaa$PROPDMGEXP` and `noaa$CROPDMGEXP`), i.e., 1.55B for $1,550,000,000. Alphabetical characters used to signify magnitude include "K" for thousands, "M" for millions, and "B" for billions. In order to get an accurate value, these tuples(`DMG, DMGEXP`) must be decoded and converted into plain values. The task is performed by `value_calc` function (which does the calculation), and `damage_calc` (which sums the two kinds of damages). As we previously have done, we will select the first `r max` most harmful events.
 
-```{r}
+```{r, cache = TRUE}
 damage_calc <- function(row) {
     value_calc <- function(number = 0, exp = "") {
         if (exp %in% c("", "-", "?", "+")) return(number)
@@ -80,8 +80,8 @@ damage_calc <- function(row) {
         if (exp %in% c("B", "b")) return(number * 10^9)
         return(number * 10^as.integer(exp))
     }
-    prop <- value_calc(as.numeric(row["PROPDMG"]), as.character(row["PROPDMGEXP"]))
-    crop <- value_calc(as.numeric(row["CROPDMG"]), as.character(row["CROPDMGEXP"]))
+    prop <- value_calc(as.numeric(row["PROPDMG"]), row["PROPDMGEXP"])
+    crop <- value_calc(as.numeric(row["CROPDMG"]), row["CROPDMGEXP"])
     return(prop + crop)
 }
 
@@ -93,7 +93,7 @@ noaa_economic_impact <- noaa %>%
                             summarise(damage = sum(DAMAGE)) %>%
                             arrange(desc(damage)) %>%
                             slice(1:max) %>%
-                            mutate(type = factor(type, rev(as.character(type))))
+                            mutate(type = factor(type, rev(type)))
 
 noaa_economic_impact
 
@@ -103,11 +103,11 @@ ggplot(noaa_economic_impact, aes(x = type, y = damage, fill = type)) + geom_bar(
 
 ## Results
 
-```{r}
+```{r, cache = TRUE}
 harmful_year <- noaa %>%
                        filter(EVTYPE %in% c("TORNADO", "FLOOD")) %>%
                        select(type = EVTYPE, year = BGN_DATE) %>%
-                       transform(count = 1, year = year(as.Date(as.character(year), "%m/%d/%Y"))) %>%
+                       transform(count = 1, year = year(mdy_hms(year))) %>%
                        group_by(type, year) %>%
                        summarise(total = sum(count)) %>%
                        arrange(type, year)
