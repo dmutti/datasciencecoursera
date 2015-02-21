@@ -8,6 +8,7 @@ library(ggplot2, warn.conflicts = FALSE)
 library(RColorBrewer, warn.conflicts = FALSE)
 library(reshape2, warn.conflicts = FALSE)
 library(scales, warn.conflicts = FALSE)
+library(lubridate, warn.conflicts = FALSE)
 
 cfile <- "./repdata-data-StormData.csv.bz2"
 bfile <- "./repdata-data-StormData.rds"
@@ -55,7 +56,7 @@ noaa_health_impact <- noaa %>%
                           group_by(type = EVTYPE) %>% 
                           summarise(fatalities = sum(FATALITIES), injuries = sum(INJURIES)) %>%
                           arrange(desc(fatalities, injuries)) %>%
-                          slice(1:20) %>%
+                          slice(1:10) %>%
                           mutate(type = factor(type, rev(as.character(type))))
 
 noaa_health_impact
@@ -90,7 +91,7 @@ noaa_economic_impact <- noaa %>%
                             group_by(type = EVTYPE) %>% 
                             summarise(damage = sum(DAMAGE)) %>%
                             arrange(desc(damage)) %>%
-                            slice(1:20) %>%
+                            slice(1:10) %>%
                             mutate(type = factor(type, rev(as.character(type))))
 
 noaa_economic_impact
@@ -102,23 +103,19 @@ ggplot(noaa_economic_impact, aes(x = type, y = damage, fill = type)) + geom_bar(
 ## Results
 
 ```{r}
-top_events <- as.factor(unique(c(head(as.character(noaa_economic_impact$type), 5), head(as.character(noaa_health_impact$type), 5))))
+harmful_year <- noaa %>%
+                       filter(EVTYPE %in% c("TORNADO", "FLOOD")) %>%
+                       select(type = EVTYPE, year = BGN_DATE) %>%
+                       transform(count = 1, year = year(as.Date(as.character(year), "%m/%d/%Y"))) %>%
+                       group_by(type, year) %>%
+                       summarise(total = sum(count)) %>%
+                       arrange(type, year)
 
-noaa_most_harmful <- noaa %>%
-                    filter(EVTYPE %in% top_events) %>%
-                    select(type = EVTYPE) %>%
-                    mutate(count = 1) %>%
-                    group_by(type) %>%
-                    summarise(total = sum(count)) %>%
-                    arrange(desc(total)) %>%
-                    slice(1:5) %>%
-                    mutate(type = factor(type, rev(as.character(type))))
+group_by(harmful_year, type) %>% summarise(occurrences = sum(total))
 
-noaa_most_harmful
-
-ggplot(noaa_most_harmful, aes(x = type, y = total, fill = type)) + geom_bar(stat = "identity") + scale_fill_brewer(palette = "Paired") + coord_flip() + scale_y_continuous(labels = comma) + xlab("Severe Weather Event") + ylab("Frequency") + ggtitle("Most Harmful Occurring Events") + guides(fill = FALSE)
+ggplot(data=harmful_year, aes(x=year, y=total, group=type, colour=type)) + geom_line() + geom_point(size = 3)  + scale_x_continuous(breaks = c(seq(from = 1950, to = 2011, by = 10))) + scale_y_continuous(breaks = c(seq(from = 0, to = 4000, by = 500))) + scale_color_brewer(palette = "Set1") + xlab("Year") + ylab("Occurrences") + ggtitle("Most Harmful Event Occurrences per Year")
 ```
 
 In this article, we analysed the NOAA Storm Database in order to assess the economic and population impacts of severe weather events. To evaluate the economic aspect, this article took into consideration the sum of damages caused to properties and crops, represented by two pairs of columns `{(PROPDMG,PROPDMGEXP), (CROPDMG,CROPDMGEXP)}`. Public health impact was measured in terms of fatalities and injuries, represented by `{FATALITIES, INJURIES}` columns, respectively. The idea is that events were ordered in descending order, first by the number of fatalities followed by the number of injuries.
 
-Our data allow us to conclude that **FLOODS** are the most harmful weather events from an economical point of view, with losses surpassing US$ 150 billion dollars; from a public health perspective, **TORNADOES** are the most harmful events, causing a total of 5633 fatalities and 91346 injuries. The top 5 most harmful ocurring events are `r noaa_most_harmful$type`.
+Our data allow us to conclude that **FLOODS** are the most harmful weather events from an economical point of view, with losses surpassing US$ 150 billion dollars; from a public health perspective, **TORNADOES** are the most harmful events, causing a total of 5633 fatalities and 91346 injuries.
