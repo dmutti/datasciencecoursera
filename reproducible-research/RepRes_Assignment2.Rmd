@@ -15,10 +15,9 @@ library(lubridate, warn.conflicts = FALSE)
 library(stringr, warn.conflicts = FALSE)
 
 cfile <- "./repdata-data-StormData.csv.bz2"
-bfile <- "./repdata-data-StormData.rds"
 url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
 
-max <- 10
+sessionInfo()
 ```
 
 Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.
@@ -34,24 +33,22 @@ The analysis of the NOAA Storm Database allowed us to conclude that **FLOODS** a
 The dataset is available [here](`r url`) in the form of a comma-separated-value file, compressed via the bzip2 algorithm to reduce its size. The dataset is downloaded from the aforementioned website in the working directory and read into the `noaa` variable.
 
 ```{r, cache = TRUE}
-if (!file.exists(bfile)) {
-    if (!file.exists(cfile)) {
-        download.file(url = url, destfile = cfile, method = "curl")
-    }
-    noaa <- read.table(bzfile(cfile), header = TRUE, stringsAsFactors = FALSE, na.strings = "NA", sep = ",", quote = "\"")
-    noaa <- noaa %>%
-                select(EVTYPE, FATALITIES, INJURIES, PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP, BGN_DATE) %>%
-                mutate(EVTYPE = str_trim(toupper(EVTYPE)))
+if (!file.exists(cfile)) {
+    download.file(url = url, destfile = cfile, method = "curl")
 }
+noaa <- read.table(bzfile(cfile), header = TRUE, stringsAsFactors = FALSE, na.strings = "NA", sep = ",", quote = "\"")
+noaa <- noaa %>%
+            select(EVTYPE, FATALITIES, INJURIES, PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP, BGN_DATE) %>%
+            mutate(EVTYPE = str_trim(toupper(EVTYPE)))
+
+max <- 10
+
+event_types <- levels(as.factor(noaa$EVTYPE))
 ```
 
 In what follows, we will develop and present the code necessary to address the questions that were previously listed.
 
 #### Q1 -- Across the United States, which types of events are most harmful with respect to population health?
-
-```{r}
-event_types <- levels(as.factor(noaa$EVTYPE))
-```
 
 According to the [storm data documentation](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf), the `EVTYPE` variable denotes the types of weather events that happened across the United States. In this article, we will take into consideration the sum of the number of fatalities (`noaa$FATALITIES`) and the number of injuries (`noaa$INJURIES`) as a means to order which events were most harmful with respect to population health. Since there are `r length(event_types)` distinct types of events in the database, we will select the first `r max` most harmful events.
 
