@@ -1,5 +1,7 @@
 # Probability 1
 
+[Source](https://github.com/swirldev/swirl_courses/blob/master/Statistical_Inference/Probability1/)
+
 In this lesson, we'll review basic ideas of probability, the study of quantifying the likelihood of particular events occurring. Note the similarity between the words probability and probably. Every time you use the latter word you're implying that an event is more likely than not to occur.
 
 The first step in understanding probability is to see if you understand what outcomes of an experiment are possible. For instance, if you were rolling a single, fair die once, how many outcomes are possible?
@@ -113,12 +115,12 @@ A deck of cards is a set of 52 cards, 4 suits of 13 cards each. There are two re
 
 
 ```r
-values <- c("A","2","3","4","5","6","7","8","9","10","J","Q","K")
-spades <- paste(values, "spades", sep=":")
-hearts <- paste(values, "hearts", sep=":")
-diamonds <- paste(values, "diamonds", sep=":")
-clubs <- paste(values, "clubs", sep=":")
-deck <- cbind(spades, hearts, diamonds, clubs)
+values <- c("A", as.character(2:10), "J", "Q", "K")
+suits <- c("spades", "hearts", "diamonds", "clubs")
+
+# Create a deck as a 13x4 matrix which is easy to verify by eye.
+deck <- sapply(suits, function(suit)paste(values, suit, sep=":"))
+# Verify.
 deck
 ```
 
