@@ -39,7 +39,7 @@ plot(x, y, lwd = 3, frame = FALSE, type = "l")
 segments(0,0,2,1,lwd=3)
 ```
 
-![](swirl-02-probability2_files/figure-html/unnamed-chunk-1-1.png) 
+![](swirl-03-probability2_files/figure-html/unnamed-chunk-1-1.png) 
 
 Could the diagonal line represent a probability density function for a random variable with a range of values between 0 and 2? Assume the lower side of the rectangle is the x axis.
 
@@ -55,7 +55,7 @@ segments(0,0,2,1,lwd=3)
 polygon(c(0,1.6,1.6,0),c(0,0,.8,0),lwd=3,col="lightblue")
 ```
 
-![](swirl-02-probability2_files/figure-html/unnamed-chunk-2-1.png) 
+![](swirl-03-probability2_files/figure-html/unnamed-chunk-2-1.png)
 
 ```r
 mypdf <- function(x){x/2}
