@@ -1,8 +1,3 @@
----
-output:
-  html_document:
-    keep_md: yes
----
 # Conditional Probability
 
 [Source](https://github.com/swirldev/swirl_courses/tree/master/Statistical_Inference/ConditionalProbability)
@@ -80,20 +75,35 @@ We can use the prevalence of HIV in the patient's population as the value for P(
 
 Disease prevalence is .001. Test sensitivity (+ result with disease) is 99.7% and specificity (- result without disease) is 98.5%. First compute the numerator, P(+|D)*P(D). (This is also part of the denominator.)
 
-```{r}
+
+```r
 .997 * .001
+```
+
+```
+## [1] 0.000997
 ```
 
 Now solve for the remainder of the denominator, P(+|~D)*P(~D).
 
-```{r}
+
+```r
 (1-.985)*(1-.001)
+```
+
+```
+## [1] 0.014985
 ```
 
 Now put the pieces together to compute the probability that the patient has the disease given his positive test result, P(D|+). Plug your last two answers into the formula `P(+|D) * P(D) / ( P(+|D) * P(D) + P(+|~D) * P(~D) )` to compute P(D|+).
 
-```{r}
+
+```r
 (.997 * .001) / ((.997 * .001) + ((1-.985)*(1-.001)))
+```
+
+```
+## [1] 0.06238268
 ```
 
 So the patient has a 6% chance of having HIV given this positive test result. The expression P(D|+) is called the positive predictive value. Similarly, P(~D|-), is called the negative predictive value, the probability that a patient does not have the disease given a negative test result.
