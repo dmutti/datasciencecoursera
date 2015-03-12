@@ -1,0 +1,10 @@
+---
+output:
+  html_document:
+    keep_md: yes
+---
+# Expectations
+
+[Source](https://github.com/swirldev/swirl_courses/tree/master/Statistical_Inference/Expectations)
+
+In this lesson, as you might expect, we'll discuss expected values. Expected values of what, exactly?
