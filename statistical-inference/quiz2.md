@@ -45,31 +45,30 @@ pbinom(3,size=5,prob=.5,lower.tail = FALSE)
 
 
 ```r
-mean6<- 15
-sd6<- 10
-value6a<- (14-mean6)/(sd6/sqrt(100))
-p14<-pnorm(value6a)
-value6b<- (16-mean6)/(sd6/sqrt(100))
-p16<-pnorm(value6b)
-answ6<-p16-p14
-round(answ6,2)
+mean <- 15
+sd <- 10
+value1 <- (14-mean) / (sd/sqrt(100))
+p14 <- pnorm(value1)
+value2 <- (16-mean) / (sd/sqrt(100))
+p16 <- pnorm(value2)
+p16-p14
 ```
 
 ```
-## [1] 0.68
+## [1] 0.6826895
 ```
 
 6. Consider a standard uniform density. The mean for this density is .5 and the variance is 1 / 12. You sample 1,000 observations from this distribution and take the sample mean, what value would you expect it to be near?
 
 ```
-mean = 1/2(min + max)
-1/2 = 1/2(min + max)
+mean = 1/2 * (min + max)
+1/2 = 1/2 * (min + max)
 1 = min + max
 ```
 
 ```
-var = 1/2(max - min) ^ 2
-1/12 = 1/12(max - min) ^ 2
+var = 1/2 * ((max - min) ^ 2)
+1/12 = 1/12 * ((max - min) ^ 2)
 1 = (max - min) ^ 2
 ````
 
@@ -77,16 +76,14 @@ var = 1/2(max - min) ^ 2
 
 
 ```r
-min <- sqrt(.25)
-max <- 3 * sqrt(.25)
-```
+min <- .5
+max <- 1.5
 
-```r
 mean(cumsum(runif(1000, min = min, max = max))/1000)
 ```
 
 ```
-## [1] 0.5016902
+## [1] 0.4992511
 ```
 
 7. The number of people showing up at a bus stop is assumed to be Poisson with a mean of 5 people per hour. You watch the bus stop for 3 hours. About what's the probability of viewing 10 or fewer people?
