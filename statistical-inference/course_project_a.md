@@ -23,7 +23,7 @@ y <- dexp(x)
 qplot(x, y, type="l", xlab = "x", ylab = "Probability Density", main = "Figure 1: Exponential Probability Density Function")
 ```
 
-![](figure/unnamed-chunk-2-1.png) 
+![](course_project_a_figure/unnamed-chunk-2-1.png) 
 
 The exponential distribution can be simulated in R with `rexp(n, lambda)` where `lambda` is the rate parameter. The mean of exponential distribution is `1/lambda` and the standard deviation is also `1/lambda`. The investigation consists of one thousand simulations, each one them comprised of the averages of 40 exponentials. The value of lambda used in the `rexp` function is fixed in 0.2 for all of the simulations.
 
@@ -52,7 +52,8 @@ In order to keep this report reproducible, we must set a random seed -- a number
 set.seed(1)
 ```
 
-We start by generating 1000 random samples of size 40, with rate (lambda) equals 0.2.
+We start by generating 1000 random samples of size 40, with rate (lambda) equals 0.2. Then, we store the calculated mean of these several samples into the `means` vector.
+
 
 ```r
 exp_sim <- matrix(rexp(sims * n, lambda), sims, n)
@@ -105,14 +106,14 @@ The sample variance is **0.6177072** and the theoretical variance is **0.625**. 
 
 ### 3. Distribution
 
-The following plot shows that the histogram ..... approximates the normal distribution.
+The following plot contains the histogram (light blue) of the means of 1000 random samples of size 40. It also contains the density curve (blue) to demonstrate how it approximates the normal distribution. Additionally, the dashed red line representes the mean of the sample.
 
 
 ```r
-ggplot(data.frame(means), aes(x = means)) + geom_histogram(aes(y=..density..), colour = "black", fill = "wheat1", binwidth = lambda) + geom_density(colour = "blue", size = 1)
+ggplot(data.frame(means), aes(x = means)) + geom_histogram(aes(y=..density..), colour = "black", fill = "white", binwidth = lambda) + geom_density(colour = "blue", size = 1) + geom_vline(aes(xintercept = sample_mean), linetype = "dashed", size = 2, colour = "red") + scale_x_continuous(breaks = c(1:10))
 ```
 
-![](figure/unnamed-chunk-8-1.png) 
+![](course_project_a_figure/unnamed-chunk-8-1.png) 
 
 ## Appendix
 
