@@ -28,6 +28,14 @@ qplot(x, y, type="l", xlab = "x", ylab = "Probability Density", main = "Figure 1
 
 The exponential distribution can be simulated in R with `rexp(n, lambda)` where `lambda` is the rate parameter. The mean of exponential distribution is `1/lambda` and the standard deviation is also `1/lambda`. The investigation consists of one thousand simulations, each one them comprised of the averages of 40 exponentials. The value of lambda used in the `rexp` function is fixed in 0.2 for all of the simulations.
 
+This experiment parameters are the following.
+
+```r
+sims <- 1000
+lambda <- 0.2
+n <- 40
+```
+
 ### Objectives
 
 The specific objectives of this report are the following:
@@ -49,12 +57,62 @@ set.seed(12345)
 ```r
 means = NULL
 for (i in 1 : 1000)
-    means = c(means, mean(rexp(40, rate = .2)))
+    means = c(means, mean(rexp(40, rate = lambda)))
+```
+
+### 1. Sample Mean versus Theoretical Mean
+
+The sample mean, is obtained in what follows.
+
+
+```r
+print(sample_mean <- mean(means))
+```
+
+```
+## [1] 4.971972
+```
+
+```r
+print(theoretical_mean <- 1/lambda)
+```
+
+```
+## [1] 5
+```
+
+The mean of 1000 samples when sample size is 40 is **4.971972**. The theoretical mean from the distribution is 1/lambda; when lambda is 0.2 the theoretical mean is **5**. When comparing the estimated value and the theoretical one, there is a small difference between then, -0.028028, to be exact.
+
+### 2. Sample variance versus Theoretical Variance
+
+
+```r
+print(sample_variance <- var(means))
+```
+
+```
+## [1] 0.5954369
+```
+
+```r
+print(theoretical_variance <- ((1 / lambda)^2)/40)
+```
+
+```
+## [1] 0.625
+```
+
+The sample variance is **0.5954369** and the theoretical variance is **0.625**. When comparing the estimated value and the theoretical one, there is a small difference between then, -0.0295631, to be exact.
+
+### 3. Distribution
+
+
+```r
 breaks <- quantile(means,seq(0, 1, by = 0.1))
 hist(means, col = rainbow(length(breaks)))
 ```
 
-![](figure/unnamed-chunk-4-1.png) 
+![](figure/unnamed-chunk-8-1.png) 
 
 
 ## Appendix
