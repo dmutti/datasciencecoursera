@@ -1,7 +1,6 @@
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-
 <!-- https://class.coursera.org/statinference-012/human_grading/view/courses/973520/assessments/4/submissions -->
 <!-- https://rstudio-pubs-static.s3.amazonaws.com/26693_e1151035722942b2813c0063c6b220ae.html -->
+<!-- https://rpubs.com/abhiuee/53828 -->
 # The Exponential Distribution -- An Investigation Using R
 #### Author: Danilo Mutti
 
@@ -46,18 +45,18 @@ The specific objectives of this report are the following:
 
 ## Simulation
 
-In order to keep this report reproducible, we must set a random seed -- a number on which the random number stream depends on -- so the reader can obtain exactly the same numbers in his/her R environment when following the steps presented in this report. In our case, the seed is set to the integer number `12345`.
+In order to keep this report reproducible, we must set a random seed -- a number on which the random number stream depends on -- so the reader can obtain exactly the same numbers in his/her R environment when following the steps presented in this report. In our case, the seed is set to the integer number `1`.
 
 
 ```r
-set.seed(12345)
+set.seed(1)
 ```
 
+We start by generating 1000 random samples of size 40, with rate (lambda) equals 0.2.
 
 ```r
-means = NULL
-for (i in 1 : 1000)
-    means = c(means, mean(rexp(40, rate = lambda)))
+exp_sim <- matrix(rexp(sims * n, lambda), sims, n)
+means <- rowMeans(exp_sim)
 ```
 
 ### 1. Sample Mean versus Theoretical Mean
@@ -70,7 +69,7 @@ print(sample_mean <- mean(means))
 ```
 
 ```
-## [1] 4.971972
+## [1] 4.990025
 ```
 
 ```r
@@ -81,7 +80,7 @@ print(theoretical_mean <- 1/lambda)
 ## [1] 5
 ```
 
-The mean of 1000 samples when sample size is 40 is **4.971972**. The theoretical mean from the distribution is 1/lambda; when lambda is 0.2 the theoretical mean is **5**. When comparing the estimated value and the theoretical one, there is a small difference between then, -0.028028, to be exact.
+The mean of 1000 samples when sample size is 40 is **4.9900252**. The theoretical mean from the distribution is 1/lambda; when lambda is 0.2 the theoretical mean is **5**. When comparing the estimated value and the theoretical one, there is a small difference between then, -0.0099748, to be exact.
 
 ### 2. Sample variance versus Theoretical Variance
 
@@ -91,7 +90,7 @@ print(sample_variance <- var(means))
 ```
 
 ```
-## [1] 0.5954369
+## [1] 0.6177072
 ```
 
 ```r
@@ -102,18 +101,18 @@ print(theoretical_variance <- ((1 / lambda)^2)/40)
 ## [1] 0.625
 ```
 
-The sample variance is **0.5954369** and the theoretical variance is **0.625**. When comparing the estimated value and the theoretical one, there is a small difference between then, -0.0295631, to be exact.
+The sample variance is **0.6177072** and the theoretical variance is **0.625**. When comparing the estimated value and the theoretical one, there is a small difference between then, -0.0072928, to be exact.
 
 ### 3. Distribution
 
+The following plot shows that the histogram ..... approximates the normal distribution.
+
 
 ```r
-breaks <- quantile(means,seq(0, 1, by = 0.1))
-hist(means, col = rainbow(length(breaks)))
+ggplot(data.frame(means), aes(x = means)) + geom_histogram(aes(y=..density..), colour = "black", fill = "wheat1", binwidth = lambda) + geom_density(colour = "blue", size = 1)
 ```
 
 ![](figure/unnamed-chunk-8-1.png) 
-
 
 ## Appendix
 

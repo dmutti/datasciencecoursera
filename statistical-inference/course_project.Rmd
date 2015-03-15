@@ -11,7 +11,7 @@ output:
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(fig.path = "figure/")
-set.seed(12345)
+set.seed(1)
 library(ggplot2)
 ```
 
@@ -50,16 +50,17 @@ The specific objectives of this report are the following:
 
 ## Simulation
 
-In order to keep this report reproducible, we must set a random seed -- a number on which the random number stream depends on -- so the reader can obtain exactly the same numbers in his/her R environment when following the steps presented in this report. In our case, the seed is set to the integer number `12345`.
+In order to keep this report reproducible, we must set a random seed -- a number on which the random number stream depends on -- so the reader can obtain exactly the same numbers in his/her R environment when following the steps presented in this report. In our case, the seed is set to the integer number `1`.
 
 ```{r, eval = FALSE}
-set.seed(12345)
+set.seed(1)
 ```
 
+We start by generating 1000 random samples of size 40, with rate (lambda) equals `r lambda`. Then, we store the calculated mean of these several samples into the `means` vector.
+
 ```{r}
-means = NULL
-for (i in 1 : 1000)
-    means = c(means, mean(rexp(40, rate = lambda)))
+exp_sim <- matrix(rexp(sims * n, lambda), sims, n)
+means <- rowMeans(exp_sim)
 ```
 
 ### 1. Sample Mean versus Theoretical Mean
@@ -84,11 +85,11 @@ The sample variance is **`r sample_variance`** and the theoretical variance is *
 
 ### 3. Distribution
 
-```{r}
-breaks <- quantile(means,seq(0, 1, by = 0.1))
-hist(means, col = rainbow(length(breaks)))
-```
+The following plot shows that the histogram ..... approximates the normal distribution.
 
+```{r}
+ggplot(data.frame(means), aes(x = means)) + geom_histogram(aes(y=..density..), colour = "black", fill = "wheat1", binwidth = lambda) + geom_density(colour = "blue", size = 1)
+```
 
 ## Appendix
 
