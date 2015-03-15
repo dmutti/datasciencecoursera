@@ -3,10 +3,9 @@ output:
   html_document:
     keep_md: yes
 ---
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-
 <!-- https://class.coursera.org/statinference-012/human_grading/view/courses/973520/assessments/4/submissions -->
 <!-- https://rstudio-pubs-static.s3.amazonaws.com/26693_e1151035722942b2813c0063c6b220ae.html -->
+<!-- https://rpubs.com/abhiuee/53828 -->
 # The Exponential Distribution -- An Investigation Using R
 #### Author: Danilo Mutti
 
