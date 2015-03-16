@@ -35,6 +35,13 @@ str(ToothGrowth)
 summary(ToothGrowth)
 ```
 
+The following figure *seems to indicate* that orange juice (OJ) is more effective for lower/intermediate dose levels. When dose levels are higher, the effectiveness between OJ and Vitamin C (VC) *seems to be similar*, with OJ presenting more consistent results.
+
+```{r}
+coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
+       xlab = "ToothGrowth data: length vs dose, given type of supplement")
+```
+
 ## Appendix
 
 This section contains the environment in which this report was produced.

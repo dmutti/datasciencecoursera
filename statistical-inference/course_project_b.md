@@ -1,3 +1,7 @@
+<!--
+    https://rstudio-pubs-static.s3.amazonaws.com/35364_334944a02fcf4792b232aacbfee2f6e6.html
+    https://rpubs.com/roozbehdavari/33121
+-->
 # Assessing the ToothGrowth Dataset with R
 #### Author: Danilo Mutti
 
@@ -41,6 +45,16 @@ summary(ToothGrowth)
 ##  3rd Qu.:25.27           3rd Qu.:2.000  
 ##  Max.   :33.90           Max.   :2.000
 ```
+
+The following figure *seems to indicate* that orange juice (OJ) is more effective for lower/intermediate dose levels. When dose levels are higher, the effectiveness between OJ and Vitamin C (VC) *seems to be similar*, with OJ presenting more consistent results.
+
+
+```r
+coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
+       xlab = "ToothGrowth data: length vs dose, given type of supplement")
+```
+
+![](course_project_b_figure/unnamed-chunk-3-1.png) 
 
 ## Appendix
 
