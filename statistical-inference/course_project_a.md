@@ -110,7 +110,7 @@ The following plot contains the histogram (light blue) of the means of 1000 rand
 
 
 ```r
-ggplot(data.frame(means), aes(x = means)) + geom_histogram(aes(y=..density..), colour = "black", fill = "white", binwidth = lambda) + geom_density(colour = "blue", size = 1) + geom_vline(aes(xintercept = sample_mean), linetype = "dashed", size = 2, colour = "red") + scale_x_continuous(breaks = c(1:10))
+ggplot(data.frame(means), aes(x = means)) + geom_histogram(aes(y=..density..), colour = "black", fill = "white", binwidth = lambda) + geom_density(colour = "skyblue1", fill="skyblue1", alpha = .3) + geom_vline(aes(xintercept = sample_mean), linetype = "dashed", size = 2, colour = "red") + scale_x_continuous(breaks = c(1:10))
 ```
 
 ![](course_project_a_figure/unnamed-chunk-8-1.png) 
