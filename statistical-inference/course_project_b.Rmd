@@ -1,0 +1,40 @@
+---
+output:
+  html_document:
+    keep_md: yes
+---
+# Assessing the ToothGrowth Dataset with R
+#### Author: Danilo Mutti
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(fig.path = "course_project_b_figure/")
+set.seed(1)
+library(ggplot2)
+library(dplyr, warn.conflicts = FALSE)
+```
+
+The [ToothGrowth dataset](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html) (TG) contains data about the effect of vitamin C on tooth growth in Guinea pigs. In this study, the response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).
+
+The dataset contains a data frame with 60 observations on 3 variables.
+
+|column index|column name| type      | description |
+|------------|-----------|-----------|-------------|
+| [,1]       | len	     | numeric	 |Tooth length |
+| [,2]       | supp	     | factor    | Supplement type (VC or OJ).|
+| [,3]       | dose      | numeric   | Dose in milligrams.|
+
+We start by loading the dataset, followed by a basic exploration of how the data is structured.
+
+```{r}
+data(ToothGrowth)
+str(ToothGrowth)
+summary(ToothGrowth)
+```
+
+## Appendix
+
+This section contains the environment in which this report was produced.
+
+```{r}
+sessionInfo()
+```
