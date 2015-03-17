@@ -56,6 +56,36 @@ coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
 
 ![](course_project_b_figure/unnamed-chunk-3-1.png) 
 
+
+## Data Processing
+
+In this dataset, rows 1 to 10 correspond to the observations from Guinea pigs 1 to 10. The eleventh row contains another observation of Guinea pig number 1, and so on. In order to tidy this dataset, we are going to fit it into 6 columns and 10 rows. Each row corresponds to one specific Guinea pig, and each column represents a supplement (VC or OJ) and its associated dose (0.5, 1.0 or 2.0).
+
+
+```r
+VC_05 <- ToothGrowth$len[1:10]
+VC_10 <- ToothGrowth$len[11:20]
+VC_20 <- ToothGrowth$len[21:30]
+OJ_05 <- ToothGrowth$len[31:40]
+OJ_10 <- ToothGrowth$len[41:50]
+OJ_20 <- ToothGrowth$len[51:60]
+print(tidy <- data.frame(VC_05, VC_10, VC_20, OJ_05, OJ_10, OJ_20))
+```
+
+```
+##    VC_05 VC_10 VC_20 OJ_05 OJ_10 OJ_20
+## 1    4.2  16.5  23.6  15.2  19.7  25.5
+## 2   11.5  16.5  18.5  21.5  23.3  26.4
+## 3    7.3  15.2  33.9  17.6  23.6  22.4
+## 4    5.8  17.3  25.5   9.7  26.4  24.5
+## 5    6.4  22.5  26.4  14.5  20.0  24.8
+## 6   10.0  17.3  32.5  10.0  25.2  30.9
+## 7   11.2  13.6  26.7   8.2  25.8  26.4
+## 8   11.2  14.5  21.5   9.4  21.2  27.3
+## 9    5.2  18.8  23.3  16.5  14.5  29.4
+## 10   7.0  15.5  29.5   9.7  27.3  23.0
+```
+
 ## Appendix
 
 This section contains the environment in which this report was produced.
@@ -76,13 +106,13 @@ sessionInfo()
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] dplyr_0.3.0.2 ggplot2_1.0.0
+## [1] reshape2_1.4.1 dplyr_0.3.0.2  ggplot2_1.0.0 
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] DBI_0.3.1        MASS_7.3-35      Rcpp_0.11.3      assertthat_0.1  
 ##  [5] colorspace_1.2-4 digest_0.6.6     evaluate_0.5.5   formatR_1.0     
 ##  [9] grid_3.1.2       gtable_0.1.2     htmltools_0.2.6  knitr_1.9       
 ## [13] magrittr_1.5     munsell_0.4.2    parallel_3.1.2   plyr_1.8.1      
-## [17] proto_0.3-10     reshape2_1.4.1   rmarkdown_0.3.10 scales_0.2.4    
-## [21] stringr_0.6.2    tools_3.1.2      yaml_2.1.13
+## [17] proto_0.3-10     rmarkdown_0.3.10 scales_0.2.4     stringr_0.6.2   
+## [21] tools_3.1.2      yaml_2.1.13
 ```
