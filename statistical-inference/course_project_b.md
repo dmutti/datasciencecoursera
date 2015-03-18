@@ -1,6 +1,7 @@
 <!--
     https://rstudio-pubs-static.s3.amazonaws.com/35364_334944a02fcf4792b232aacbfee2f6e6.html
     https://rpubs.com/roozbehdavari/33121
+    http://www.r-bloggers.com/two-sample-students-t-test-1/
 -->
 # Assessing the ToothGrowth Dataset with R
 #### Author: Danilo Mutti
@@ -63,28 +64,74 @@ In this dataset, rows 1 to 10 correspond to the observations from Guinea pigs 1 
 
 
 ```r
-VC_05 <- ToothGrowth$len[1:10]
-VC_10 <- ToothGrowth$len[11:20]
-VC_20 <- ToothGrowth$len[21:30]
-OJ_05 <- ToothGrowth$len[31:40]
-OJ_10 <- ToothGrowth$len[41:50]
-OJ_20 <- ToothGrowth$len[51:60]
-print(tidy <- data.frame(VC_05, VC_10, VC_20, OJ_05, OJ_10, OJ_20))
+ToothGrowth$guinea.pig <- rep(c(1:10), 6)
+print(tidy <- dcast(ToothGrowth, guinea.pig ~ supp + dose, value.var = "len"))
 ```
 
 ```
-##    VC_05 VC_10 VC_20 OJ_05 OJ_10 OJ_20
-## 1    4.2  16.5  23.6  15.2  19.7  25.5
-## 2   11.5  16.5  18.5  21.5  23.3  26.4
-## 3    7.3  15.2  33.9  17.6  23.6  22.4
-## 4    5.8  17.3  25.5   9.7  26.4  24.5
-## 5    6.4  22.5  26.4  14.5  20.0  24.8
-## 6   10.0  17.3  32.5  10.0  25.2  30.9
-## 7   11.2  13.6  26.7   8.2  25.8  26.4
-## 8   11.2  14.5  21.5   9.4  21.2  27.3
-## 9    5.2  18.8  23.3  16.5  14.5  29.4
-## 10   7.0  15.5  29.5   9.7  27.3  23.0
+##    guinea.pig OJ_0.5 OJ_1 OJ_2 VC_0.5 VC_1 VC_2
+## 1           1   15.2 19.7 25.5    4.2 16.5 23.6
+## 2           2   21.5 23.3 26.4   11.5 16.5 18.5
+## 3           3   17.6 23.6 22.4    7.3 15.2 33.9
+## 4           4    9.7 26.4 24.5    5.8 17.3 25.5
+## 5           5   14.5 20.0 24.8    6.4 22.5 26.4
+## 6           6   10.0 25.2 30.9   10.0 17.3 32.5
+## 7           7    8.2 25.8 26.4   11.2 13.6 26.7
+## 8           8    9.4 21.2 27.3   11.2 14.5 21.5
+## 9           9   16.5 14.5 29.4    5.2 18.8 23.3
+## 10         10    9.7 27.3 23.0    7.0 15.5 29.5
 ```
+
+## Data Analysis
+
+In this section, we are going to perform several tests to compare tooth growth of Guinea pigs by supplement (OJ, VC) and dose (0.5, 1.0, and 2.0 milligrams).
+
+### 0.5 milligrams - OJ versus VC
+
+Before proceeding with the t-test, it is necessary to evaluate the sample variances of the two groups, using a Fisher's F-test to verify the homoskedasticity (homogeneity of variances).
+
+
+```r
+var.test(tidy$OJ_0.5, tidy$VC_0.5)
+```
+
+```
+## 
+## 	F test to compare two variances
+## 
+## data:  tidy$OJ_0.5 and tidy$VC_0.5
+## F = 2.6364, num df = 9, denom df = 9, p-value = 0.1649
+## alternative hypothesis: true ratio of variances is not equal to 1
+## 95 percent confidence interval:
+##   0.6548444 10.6141301
+## sample estimates:
+## ratio of variances 
+##             2.6364
+```
+
+We obtained p-value greater than 0.05, then we can assume that the two variances are homogeneous.
+Then call the function `t.test` for homogeneous variances (`var.equal = TRUE`) and independent samples (`paired = FALSE`)
+
+
+```r
+t.test(tidy$OJ_0.5, tidy$VC_0.5, paired = FALSE, var.equal = TRUE)
+```
+
+```
+## 
+## 	Two Sample t-test
+## 
+## data:  tidy$OJ_0.5 and tidy$VC_0.5
+## t = 3.1697, df = 18, p-value = 0.005304
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  1.770262 8.729738
+## sample estimates:
+## mean of x mean of y 
+##     13.23      7.98
+```
+
+The value of t-computed (3.1697) is less than the tabulated t-value for 18 degrees of freedom (2.100922). This confirms that we **can reject**, with a 95% confidence interval, the null hypothesis H0 of equality of the means, i.e., OJ is more effective than VC when the dosage is 0.5mg.
 
 ## Appendix
 
@@ -106,13 +153,12 @@ sessionInfo()
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] reshape2_1.4.1 dplyr_0.3.0.2  ggplot2_1.0.0 
+## [1] reshape2_1.4.1 ggplot2_1.0.0 
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] DBI_0.3.1        MASS_7.3-35      Rcpp_0.11.3      assertthat_0.1  
-##  [5] colorspace_1.2-4 digest_0.6.6     evaluate_0.5.5   formatR_1.0     
-##  [9] grid_3.1.2       gtable_0.1.2     htmltools_0.2.6  knitr_1.9       
-## [13] magrittr_1.5     munsell_0.4.2    parallel_3.1.2   plyr_1.8.1      
-## [17] proto_0.3-10     rmarkdown_0.3.10 scales_0.2.4     stringr_0.6.2   
-## [21] tools_3.1.2      yaml_2.1.13
+##  [1] MASS_7.3-35      Rcpp_0.11.3      colorspace_1.2-4 digest_0.6.6    
+##  [5] evaluate_0.5.5   formatR_1.0      grid_3.1.2       gtable_0.1.2    
+##  [9] htmltools_0.2.6  knitr_1.9        munsell_0.4.2    plyr_1.8.1      
+## [13] proto_0.3-10     rmarkdown_0.3.10 scales_0.2.4     stringr_0.6.2   
+## [17] tools_3.1.2      yaml_2.1.13
 ```

@@ -6,6 +6,7 @@ output:
 <!--
     https://rstudio-pubs-static.s3.amazonaws.com/35364_334944a02fcf4792b232aacbfee2f6e6.html
     https://rpubs.com/roozbehdavari/33121
+    http://www.r-bloggers.com/two-sample-students-t-test-1/
 -->
 # Assessing the ToothGrowth Dataset with R
 #### Author: Danilo Mutti
@@ -14,7 +15,7 @@ output:
 knitr::opts_chunk$set(fig.path = "course_project_b_figure/")
 set.seed(1)
 library(ggplot2, warn.conflicts = FALSE)
-library(dplyr, warn.conflicts = FALSE)
+library(reshape2, warn.conflicts = FALSE)
 ```
 
 The [ToothGrowth dataset](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html) (TG) contains data about the effect of vitamin C on tooth growth in Guinea pigs. In this study, the response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).
@@ -48,16 +49,30 @@ coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
 In this dataset, rows 1 to 10 correspond to the observations from Guinea pigs 1 to 10. The eleventh row contains another observation of Guinea pig number 1, and so on. In order to tidy this dataset, we are going to fit it into 6 columns and 10 rows. Each row corresponds to one specific Guinea pig, and each column represents a supplement (VC or OJ) and its associated dose (0.5, 1.0 or 2.0).
 
 ```{r}
-VC_05 <- ToothGrowth$len[1:10]
-VC_10 <- ToothGrowth$len[11:20]
-VC_20 <- ToothGrowth$len[21:30]
-OJ_05 <- ToothGrowth$len[31:40]
-OJ_10 <- ToothGrowth$len[41:50]
-OJ_20 <- ToothGrowth$len[51:60]
-print(tidy <- data.frame(VC_05, VC_10, VC_20, OJ_05, OJ_10, OJ_20))
+ToothGrowth$guinea.pig <- rep(c(1:10), 6)
+print(tidy <- dcast(ToothGrowth, guinea.pig ~ supp + dose, value.var = "len"))
 ```
 
 ## Data Analysis
+
+In this section, we are going to perform several tests to compare tooth growth of Guinea pigs by supplement (OJ, VC) and dose (0.5, 1.0, and 2.0 milligrams).
+
+### 0.5 milligrams - OJ versus VC
+
+Before proceeding with the t-test, it is necessary to evaluate the sample variances of the two groups, using a Fisher's F-test to verify the homoskedasticity (homogeneity of variances).
+
+```{r}
+var.test(tidy$OJ_0.5, tidy$VC_0.5)
+```
+
+We obtained p-value greater than 0.05, then we can assume that the two variances are homogeneous.
+Then call the function `t.test` for homogeneous variances (`var.equal = TRUE`) and independent samples (`paired = FALSE`)
+
+```{r}
+t.test(tidy$OJ_0.5, tidy$VC_0.5, paired = FALSE, var.equal = TRUE)
+```
+
+The value of t-computed (3.1697) is less than the tabulated t-value for 18 degrees of freedom (`r qt(0.975, 18)`). This confirms that we **can reject**, with a 95% confidence interval, the null hypothesis H0 of equality of the means, i.e., OJ is more effective than VC when the dosage is 0.5mg.
 
 ## Appendix
 
