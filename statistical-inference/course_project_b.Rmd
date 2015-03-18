@@ -4,11 +4,7 @@ output:
   html_document:
     keep_md: yes
 ---
-<!--
-    https://rstudio-pubs-static.s3.amazonaws.com/35364_334944a02fcf4792b232aacbfee2f6e6.html
-    https://rpubs.com/roozbehdavari/33121
-    http://www.r-bloggers.com/two-sample-students-t-test-1/
--->
+
 # Assessing the ToothGrowth Dataset with R
 #### Author: Danilo Mutti
 
@@ -59,27 +55,41 @@ print(tidy <- dcast(ToothGrowth, guinea.pig ~ supp + dose, value.var = "len"))
 In this section, we are going to perform several tests to compare tooth growth of Guinea pigs by supplement (OJ, VC) and dose (0.5, 1.0, and 2.0 milligrams).
 For every comparation, we will consider the following hypotheses:
 
-* H_0: Both supplements, for a given dosage, have the same effectiveness
-* H_a: OJ is more effective than VC, for a given dosage.
+* H_0: For a given dose level of Vitamin C, **there is no difference in average tooth growth** when we compare the delivery method (Orange Juice or Ascorbic Acid).
+* H_a: For a given dose level of Vitamin C, **there is an actual difference in average tooth growth** when we compare the delivery method (Orange Juice or Ascorbic Acid).
 
 The `t.test` function requires two other parameters: `var.equal` and `paired`. The first parameter indicates whether to treat the two variances as being equal. If TRUE then the pooled variance is used to estimate the variance otherwise the Welch (or Satterthwaite) approximation to the degrees of freedom is used. The dataset provides no information on this subject, hence we consider the safer choice and take the equality as FALSE. The second parameter is set as FALSE, due to the description of the dataset, which states that there were 60 distinct Guinea pigs in the experiment.
 
-### 0.5 milligrams - OJ versus VC
+### 0.5 milligrams
 
 ```{r}
-t.test(tidy$OJ_0.5, tidy$VC_0.5, paired = FALSE, var.equal = FALSE)
+tres_0.5 <- t.test(tidy$OJ_0.5, tidy$VC_0.5, paired = FALSE, var.equal = FALSE)
+tres_0.5$conf.int
 ```
 
-The `t.test` result **rejects**, with a 95% confidence interval, the null hypothesis H_0 of equality of effectiveness, i.e., OJ is more effective than VC when the dosage is 0.5mg.
+Based on `t.test` results, we decide to **reject**, with a 95% confidence interval, the null hypothesis H_0. The p-value of `r tres_0.5$p.value` indicates a low probability that OJ and VC equally promote the same average tooth growth when the dosage is 0.5 mg.
 
-### 1.0 milligrams - OJ versus VC
+### 1.0 milligrams
 
 ```{r}
-t.test(tidy$OJ_1, tidy$VC_1, paired = FALSE, var.equal = FALSE)
+tres_1 <- t.test(tidy$OJ_1, tidy$VC_1, paired = FALSE, var.equal = FALSE)
+tres_1$conf.int
 ```
 
-Once again, the `t.test` result **rejects**, with a 95% confidence interval, the null hypothesis H_0 of equality of effectiveness. Orange juice is more effective than Vitamin C when the dosage is 1.0mg.
+Similarly to the previous result, we decide to **reject**, with a 95% confidence interval, the null hypothesis H_0. The p-value of `r tres_1$p.value` indicates a low probability that OJ and VC equally promote the same average tooth growth when the dosage is 1.0 mg.
 
+### 2.0 milligrams
+
+```{r}
+tres_2 <- t.test(tidy$OJ_2, tidy$VC_2, paired = FALSE, var.equal = FALSE)
+tres_2$conf.int
+```
+
+This time, we decide to **accept**, with a 95% confidence interval, the null hypothesis H_0. The p-value of `r tres_2$p.value` indicates a high probability that OJ and VC equally promote the same average tooth growth when the dosage is 2.0 mg.
+
+## Conclusion
+
+In this report, we compared the effectiveness of tooth growth in Guinea pigs for each combination of dose level of Vitamin C (0.5, 1, and 2 mg) and delivery method (OJ or VC). We executed three `t.tests`, one for each dose, with a 95% confidence interval. As the dataset contains data of 60 distinct Guinea pigs, the sample is not paired. Additionally, we considered the two variances as not being equals. Summing up, lower and  intermediate doses of Orange Juice are more effective than Vitamin C. With a 2.0 mg dose, there is a high probability that these delivery methods are equally effective.
 
 ## Appendix
 
