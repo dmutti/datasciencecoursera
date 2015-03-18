@@ -85,6 +85,10 @@ print(tidy <- dcast(ToothGrowth, guinea.pig ~ supp + dose, value.var = "len"))
 ## Data Analysis
 
 In this section, we are going to perform several tests to compare tooth growth of Guinea pigs by supplement (OJ, VC) and dose (0.5, 1.0, and 2.0 milligrams).
+For every comparation, we will consider the following hypotheses:
+
+* H_0: Both supplements, for a given dosage, have the same effectiveness
+* H_a: OJ is more effective than VC, for a given dosage.
 
 ### 0.5 milligrams - OJ versus VC
 
@@ -110,7 +114,7 @@ var.test(tidy$OJ_0.5, tidy$VC_0.5)
 ```
 
 We obtained p-value greater than 0.05, then we can assume that the two variances are homogeneous.
-Then call the function `t.test` for homogeneous variances (`var.equal = TRUE`) and independent samples (`paired = FALSE`)
+Then we can call the function `t.test` for homogeneous variances (`var.equal = TRUE`) and independent samples (`paired = FALSE`)
 
 
 ```r
