@@ -13,7 +13,7 @@ output:
 #### Author: Danilo Mutti
 
 ```{r, echo = FALSE}
-knitr::opts_chunk$set(fig.path = "course_project_b_figure/")
+knitr::opts_chunk$set(fig.path = "course_project_b_figure/", fig.width = 5, fig.height = 3, dpi = 144)
 set.seed(1)
 library(ggplot2, warn.conflicts = FALSE)
 library(reshape2, warn.conflicts = FALSE)
@@ -23,27 +23,27 @@ The [ToothGrowth dataset](https://stat.ethz.ch/R-manual/R-devel/library/datasets
 
 The dataset contains a data frame with 60 observations on 3 variables.
 
-|column index|column name| type      | description |
-|------------|-----------|-----------|-------------|
-| [,1]       | len	     | numeric	 |Tooth length |
-| [,2]       | supp	     | factor    | Supplement type (VC or OJ).|
-| [,3]       | dose      | numeric   | Dose in milligrams.|
+| Column Index | Column Name | Column Type | Description                 |
+|:------------:|:-----------:|:-----------:|-----------------------------|
+| [,1]         | len	     | numeric	   | Tooth length                |
+| [,2]         | supp	     | factor      | Supplement type (VC or OJ). |
+| [,3]         | dose        | numeric     | Dose in milligrams.         |
 
 We start by loading the dataset, followed by a basic exploration of how the data is structured.
 
 ```{r}
 data(ToothGrowth)
 str(ToothGrowth)
-summary(ToothGrowth)
 ```
 
 The following figure *seems to indicate* that orange juice (OJ) is more effective for lower/intermediate dose levels. When dose levels are higher, the effectiveness between OJ and Vitamin C (VC) *seems to be similar*, with OJ presenting more consistent results.
 
 ```{r}
-coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
-       xlab = "ToothGrowth data: length vs dose, given type of supplement")
+g <- ggplot(data = ToothGrowth, aes(x = interaction(supp, dose), y = len, fill = supp))
+g <- g + geom_boxplot(outlier.colour = "red") + scale_fill_brewer(palette = "Pastel2")
+g <- g + labs(title="ToothGrowth by dose and supplement type",
+              x="Supplement type and dose", y="Tooth length"); g
 ```
-
 
 ## Data Processing
 
@@ -62,22 +62,24 @@ For every comparation, we will consider the following hypotheses:
 * H_0: Both supplements, for a given dosage, have the same effectiveness
 * H_a: OJ is more effective than VC, for a given dosage.
 
+The `t.test` function requires two other parameters: `var.equal` and `paired`. The first parameter indicates whether to treat the two variances as being equal. If TRUE then the pooled variance is used to estimate the variance otherwise the Welch (or Satterthwaite) approximation to the degrees of freedom is used. The dataset provides no information on this subject, hence we consider the safer choice and take the equality as FALSE. The second parameter is set as FALSE, due to the description of the dataset, which states that there were 60 distinct Guinea pigs in the experiment.
+
 ### 0.5 milligrams - OJ versus VC
 
-Before proceeding with the t-test, it is necessary to evaluate the sample variances of the two groups, using a Fisher's F-test to verify the homoskedasticity (homogeneity of variances).
-
 ```{r}
-var.test(tidy$OJ_0.5, tidy$VC_0.5)
+t.test(tidy$OJ_0.5, tidy$VC_0.5, paired = FALSE, var.equal = FALSE)
 ```
 
-We obtained p-value greater than 0.05, then we can assume that the two variances are homogeneous.
-Then we can call the function `t.test` for homogeneous variances (`var.equal = TRUE`) and independent samples (`paired = FALSE`)
+The `t.test` result **rejects**, with a 95% confidence interval, the null hypothesis H_0 of equality of effectiveness, i.e., OJ is more effective than VC when the dosage is 0.5mg.
+
+### 1.0 milligrams - OJ versus VC
 
 ```{r}
-t.test(tidy$OJ_0.5, tidy$VC_0.5, paired = FALSE, var.equal = TRUE)
+t.test(tidy$OJ_1, tidy$VC_1, paired = FALSE, var.equal = FALSE)
 ```
 
-The value of t-computed (3.1697) is less than the tabulated t-value for 18 degrees of freedom (`r qt(0.975, 18)`). This confirms that we **can reject**, with a 95% confidence interval, the null hypothesis H_0 of equality of effectiveness, i.e., OJ is more effective than VC when the dosage is 0.5mg.
+Once again, the `t.test` result **rejects**, with a 95% confidence interval, the null hypothesis H_0 of equality of effectiveness. Orange juice is more effective than Vitamin C when the dosage is 1.0mg.
+
 
 ## Appendix
 

@@ -95,8 +95,7 @@ g <- g + geom_histogram(aes(y=..density..), colour = "black", fill = "white", bi
 g <- g + geom_density(colour = "skyblue1", fill="skyblue1", alpha = .3)
 g <- g + geom_vline(aes(xintercept = sample_mean), linetype = "dashed", size = 2, colour = "red")
 g <- g + scale_x_continuous(breaks = c(1:10))
-g <- g + ggtitle("Means of 1000 Random Samples of Size 40")
-print(g)
+g <- g + ggtitle("Means of 1000 Random Samples of Size 40"); g
 ```
 
 ## Appendix
