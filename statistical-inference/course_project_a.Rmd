@@ -1,34 +1,36 @@
 ---
 output:
+  pdf_document: default
   html_document:
     keep_md: yes
 ---
-<!-- https://class.coursera.org/statinference-012/human_grading/view/courses/973520/assessments/4/submissions -->
-<!-- https://rstudio-pubs-static.s3.amazonaws.com/26693_e1151035722942b2813c0063c6b220ae.html -->
-<!-- https://rpubs.com/abhiuee/53828 -->
 # The Exponential Distribution -- An Investigation Using R
-#### Author: Danilo Mutti
+**Author: Danilo Mutti**
 
 ```{r, echo = FALSE}
-knitr::opts_chunk$set(fig.path = "course_project_a_figure/")
+knitr::opts_chunk$set(fig.path = "course_project_a_figure/", fig.width = 5, fig.height = 3, dpi = 144)
 set.seed(1)
 library(ggplot2)
 ```
 
+## Abstract
+
 This report aims at investigating the exponential distribution  in R and comparing it with the Central Limit Theorem. The investigation consists of one thousand simulations, each one them comprised of the averages of 40 exponentials. This investigation utilizes R because it is the most comprehensive statistical analysis package available. It incorporates all of the standard statistical tests, models, and analyses, as well as providing a comprehensive language for managing and manipulating data.
 
-### The Central Limit Theorem
+## The Central Limit Theorem
 
 The central limit theorem (CLT) states that, given certain conditions, the arithmetic mean of a sufficiently large number of iterates of independent random variables, each with a well-defined expected value and well-defined variance, will be approximately normally distributed, regardless of the underlying distribution. That is, suppose that a sample is obtained containing a large number of observations, each observation being randomly generated in a way that does not depend on the values of the other observations, and that the arithmetic average of the observed values is computed. If this procedure is performed many times, the central limit theorem says that the computed values of the average will be distributed according to the normal distribution (commonly known as a "bell curve") [(Wikipedia)](http://en.wikipedia.org/wiki/Central_limit_theorem], the central limit theorem (CLT)).
 
-### The Exponential Distribution
+## The Exponential Distribution
 
 The exponential distribution describes the arrival time of a randomly recurring independent event sequence. If `mu` is the mean waiting time for the next event recurrence, its probability density function is `f(x) = (1/mu * e ^ (-x/mu)) when x >= 0; 0 when x < 0`. If we call `lambda (rate) = 1 / mu`, then the **exponential probability density function (dexp)** becomes `f(x) = lambda * e ^ (-lambda * x)`. The following is the plot of the exponential probability density function.
 
 ```{r}
 x <- seq(0.0, 5.0, 0.01)
 y <- dexp(x)
-qplot(x, y, type="l", xlab = "x", ylab = "Probability Density", main = "Figure 1: Exponential Probability Density Function")
+qplot(x, y, type="l", xlab = "x", 
+      ylab = "Probability Density",
+      main = "Figure 1: Exponential Probability Density Function")
 ```
 
 The exponential distribution can be simulated in R with `rexp(n, lambda)` where `lambda` is the rate parameter. The mean of exponential distribution is `1/lambda` and the standard deviation is also `1/lambda`. The investigation consists of one thousand simulations, each one them comprised of the averages of 40 exponentials. The value of lambda used in the `rexp` function is fixed in 0.2 for all of the simulations.
@@ -40,7 +42,7 @@ lambda <- 0.2
 n <- 40
 ```
 
-### Objectives
+## Objectives
 
 The specific objectives of this report are the following:
 
@@ -68,8 +70,8 @@ means <- rowMeans(exp_sim)
 The sample mean, is obtained in what follows.
 
 ```{r}
-print(sample_mean <- mean(means))
-print(theoretical_mean <- 1/lambda)
+sample_mean <- mean(means)
+theoretical_mean <- 1 / lambda
 ```
 
 The mean of 1000 samples when sample size is 40 is **`r sample_mean`**. The theoretical mean from the distribution is 1/lambda; when lambda is 0.2 the theoretical mean is **`r theoretical_mean`**. When comparing the estimated value and the theoretical one, there is a small difference between then, `r sample_mean - theoretical_mean`, to be exact.
@@ -77,8 +79,8 @@ The mean of 1000 samples when sample size is 40 is **`r sample_mean`**. The theo
 ### 2. Sample variance versus Theoretical Variance
 
 ```{r}
-print(sample_variance <- var(means))
-print(theoretical_variance <- ((1 / lambda)^2)/40)
+sample_variance <- var(means)
+theoretical_variance <- (((1 / lambda)^2) / 40)
 ```
 
 The sample variance is **`r sample_variance`** and the theoretical variance is **`r theoretical_variance`**. When comparing the estimated value and the theoretical one, there is a small difference between then, `r sample_variance - theoretical_variance`, to be exact.
@@ -88,7 +90,13 @@ The sample variance is **`r sample_variance`** and the theoretical variance is *
 The following plot contains the histogram (light blue) of the means of 1000 random samples of size 40. It also contains the density curve (blue) to demonstrate how it approximates the normal distribution. Additionally, the dashed red line representes the mean of the sample.
 
 ```{r}
-ggplot(data.frame(means), aes(x = means)) + geom_histogram(aes(y=..density..), colour = "black", fill = "whites", binwidth = lambda) + geom_density(colour = "skyblue1", fill="skyblue1", alpha = .3) + geom_vline(aes(xintercept = sample_mean), linetype = "dashed", size = 2, colour = "red") + scale_x_continuous(breaks = c(1:10))
+g <- ggplot(data.frame(means), aes(x = means))
+g <- g + geom_histogram(aes(y=..density..), colour = "black", fill = "white", binwidth = lambda)
+g <- g + geom_density(colour = "skyblue1", fill="skyblue1", alpha = .3)
+g <- g + geom_vline(aes(xintercept = sample_mean), linetype = "dashed", size = 2, colour = "red")
+g <- g + scale_x_continuous(breaks = c(1:10))
+g <- g + ggtitle("Means of 1000 Random Samples of Size 40")
+print(g)
 ```
 
 ## Appendix

@@ -1,5 +1,6 @@
 ---
 output:
+  pdf_document: default
   html_document:
     keep_md: yes
 ---
@@ -18,7 +19,7 @@ library(ggplot2, warn.conflicts = FALSE)
 library(reshape2, warn.conflicts = FALSE)
 ```
 
-The [ToothGrowth dataset](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html) (TG) contains data about the effect of vitamin C on tooth growth in Guinea pigs. In this study, the response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).
+The [ToothGrowth dataset](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html) (TG) contains data about the effect of vitamin C on tooth growth in Guinea pigs. In this study, the response is the length of odontoblasts (teeth) in each of 60 distinct Guinea pigs, 10 for each combination of dose level of Vitamin C (0.5, 1, and 2 mg) and delivery method (orange juice or ascorbic acid).
 
 The dataset contains a data frame with 60 observations on 3 variables.
 
