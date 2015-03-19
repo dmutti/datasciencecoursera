@@ -69,7 +69,7 @@ The `t.test` function requires two other parameters: `var.equal` and `paired`. T
 **1) 0.5 milligrams**
 
 ```{r}
-tres_0.5 <- t.test(tidy$OJ_0.5, tidy$VC_0.5, paired = FALSE, var.equal = FALSE)
+tres_0.5 <- t.test(tidy$OJ_0.5 - tidy$VC_0.5, paired = FALSE, var.equal = FALSE)
 tres_0.5$conf.int
 ```
 
@@ -79,7 +79,7 @@ Based on `t.test` results, we decide to **reject**, with a 95% confidence interv
 **2) 1.0 milligrams**
 
 ```{r}
-tres_1 <- t.test(tidy$OJ_1, tidy$VC_1, paired = FALSE, var.equal = FALSE)
+tres_1 <- t.test(tidy$OJ_1 - tidy$VC_1, paired = FALSE, var.equal = FALSE)
 tres_1$conf.int
 ```
 
@@ -89,7 +89,7 @@ Similarly to the previous result, we decide to **reject**, with a 95% confidence
 **3) 2.0 milligrams**
 
 ```{r}
-tres_2 <- t.test(tidy$OJ_2, tidy$VC_2, paired = FALSE, var.equal = FALSE)
+tres_2 <- t.test(tidy$OJ_2 - tidy$VC_2, paired = FALSE, var.equal = FALSE)
 tres_2$conf.int
 ```
 
