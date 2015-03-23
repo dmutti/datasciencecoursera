@@ -1,0 +1,19 @@
+---
+output:
+  html_document:
+    keep_md: yes
+---
+# P Values
+
+[Source](https://github.com/swirldev/swirl_courses/tree/master/Statistical_Inference/P_Values)
+
+```{r, echo=FALSE}
+
+# Put initialization code in this file.
+library(ggplot2)
+#get correct paths for plotting
+fname <- "swirl-11-p-values_files/father_son.csv"
+fs <- read.csv(fname)
+quants <- c(-1:7)
+mybin <- pbinom(quants,size=8,p=.5,lower.tail=FALSE)
+```
