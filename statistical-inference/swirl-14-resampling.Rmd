@@ -1,0 +1,19 @@
+---
+output:
+  html_document:
+    keep_md: yes
+---
+# Resampling
+
+[Source](https://github.com/swirldev/swirl_courses/tree/master/Statistical_Inference/Resampling)
+
+```{r, echo=FALSE}
+library(ggplot2)
+data(InsectSprays)
+fname <- "swirl-14-resampling_files/father_son.csv"
+fs <- read.csv(fname)
+sh <- fs$sheight
+fh <- fs$fheight
+nh <- length(sh)
+B <- 1000
+```
