@@ -1,34 +1,8 @@
----
-output:
-  html_document:
-    keep_md: yes
----
 # Power
 
 [Source](https://github.com/swirldev/swirl_courses/tree/master/Statistical_Inference/Power)
 
-```{r, echo=FALSE}
-library(ggplot2)
-library(reshape2)
-sigma <- 4
-n <- 16
-mu0 <-  30
-alpha <- .05
-z <- qnorm(1-alpha)
-myplot <- function(mua) {
-  g = ggplot(data.frame(mu = c(27, 36)), aes(x = mu))
-  g = g + stat_function(fun=dnorm, geom = "line", 
-                        args = list(mean = mu0, sd = sigma / sqrt(n)), 
-                        size = 2, col = "red")
-  g = g + stat_function(fun=dnorm, geom = "line", 
-                        args = list(mean = mua, sd = sigma / sqrt(n)), 
-                        size = 2, col = "blue")
-  xitc = mu0 + qnorm(1 - alpha) * sigma / sqrt(n)
-  g = g + geom_vline(xintercept=xitc, size = 3)
-  print(g)
-  invisible()
-}
-```
+
 
 In this lesson, as the name suggests, we'll discuss POWER, which is the probability of rejecting the null hypothesis when it is false, which is good and proper.
 
@@ -64,15 +38,7 @@ Suppose we're testing a null hypothesis H_0 with an alpha level of .05. Since H_
 
 Here's the picture we've used a lot in these lessons. As you know, the shaded portion represents 5% of the area under the curve. If a test statistic fell in this shaded portion we would reject H_0 because the sample mean is too far from the mean (center) of the distribution hypothesized by H_0. Instead we would favor H_a, that mu > 30. This happens with probability .05.
 
-```{r, echo=FALSE}
-x <- seq(-4,4, length = 2000)
-dat <- data.frame(x=x, y=dnorm(x))
-g <- ggplot(dat, aes(x = x, y = y)) + geom_line(size = 1.5)+scale_y_continuous(limits=c(0,max(dat$y)))
-suppressWarnings(g <- g+ layer("area",mapping = aes(x=ifelse(x>qnorm(.95),x,NA)),
-            geom_params=list(fill="red",alpha=.5))) 
-#suppressWarnings(g <- g + geom_line(x=2.0,size=1.5,colour="blue"))
-suppressWarnings(print(g))
-```
+![](swirl-12-power_files/figure-html/unnamed-chunk-2-1.png) 
 
 You might well ask, "What does this have to do with POWER?" Good question. We'll look at some pictures to show you.
 
@@ -82,23 +48,7 @@ We're assuming normality and equal variance, say sigma^2/n, for both hypotheses,
 
 Here's a picture with the two distributions. We've drawn a vertical line at our favorite spot, at the 95th percentile of the red distribution. To the right of the line lies 5% of the red distribution.
 
-```{r, echo=FALSE}
-mua <- 32
-mu0 <- 30
-sigma <- 4
-n <- 16
-alpha <- .05
-g = ggplot(data.frame(mu = c(27, 36)), aes(x = mu))
-g = g + stat_function(fun=dnorm, geom = "line", 
-                    args = list(mean = mu0, sd = sigma / sqrt(n)), 
-                    size = 2, col = "red")
-g = g + stat_function(fun=dnorm, geom = "line", 
-                    args = list(mean = mua, sd = sigma / sqrt(n)), 
-                    size = 2, col = "blue")
-xitc = mu0 + qnorm(1 - alpha) * sigma / sqrt(n)
-g = g + geom_vline(xintercept=xitc, size = 3)
-print(g)
-```
+![](swirl-12-power_files/figure-html/unnamed-chunk-3-1.png) 
 
 Quick quiz! Which distribution represents H_0?
 
@@ -125,61 +75,38 @@ It's the area under the blue curve (H_a) to the right of the vertical line.
 
 Note that the placement of the vertical line depends on the null distribution. Here's another picture with fatter distributions. The vertical line is still at the 95th percentile of the null (red) distribution and 5% of the distribution still lies to its right. The line is calibrated to mu_0 and the variance.
 
-```{r, echo=FALSE}
-mua <- 32
-mu0 <- 30
-sigma_fat <-8
-n <- 16
-alpha <- .05
-g = ggplot(data.frame(mu = c(27, 36)), aes(x = mu))
-g = g + stat_function(fun=dnorm, geom = "line", 
-                    args = list(mean = mu0, sd = sigma_fat / sqrt(n)), 
-                    size = 2, col = "red")
-g = g + stat_function(fun=dnorm, geom = "line", 
-                    args = list(mean = mua, sd = sigma_fat / sqrt(n)), 
-                    size = 2, col = "blue")
-xitc = mu0 + qnorm(1 - alpha) * sigma_fat / sqrt(n)
-g = g + geom_vline(xintercept=xitc, size = 3)
-print(g)
-```
+![](swirl-12-power_files/figure-html/unnamed-chunk-4-1.png) 
 
 Back to our original picture.
 
-```{r, echo=FALSE}
-mua <- 32
-mu0 <- 30
-sigma <- 4
-n <- 16
-alpha <- .05
-g = ggplot(data.frame(mu = c(27, 36)), aes(x = mu))
-g = g + stat_function(fun=dnorm, geom = "line", 
-                    args = list(mean = mu0, sd = sigma / sqrt(n)), 
-                    size = 2, col = "red")
-g = g + stat_function(fun=dnorm, geom = "line", 
-                    args = list(mean = mua, sd = sigma / sqrt(n)), 
-                    size = 2, col = "blue")
-xitc = mu0 + qnorm(1 - alpha) * sigma / sqrt(n)
-g = g + geom_vline(xintercept=xitc, size = 3)
-print(g)
-```
+![](swirl-12-power_files/figure-html/unnamed-chunk-5-1.png) 
 
 We've shamelessly stolen plotting code from the slides so you can see H_a in action. Let's look at pictures before we delve into numbers. We've fixed mu_0 at 30, sigma (standard deviation) at 4 and n (sample size) at 16. The function myplot just needs an alternative mean, mu_a, as argument. Run myplot now with an argument of 34 to see what it does.
 
-```{r}
+
+```r
 myplot(34)
 ```
 
+![](swirl-12-power_files/figure-html/unnamed-chunk-6-1.png) 
+
 The distribution represented by H_a moved to the right, so almost all (100%) of the blue curve is to the right of the vertical line, indicating that with mu_a=34, the test is more powerful, i.e., there's a higher probability that it's correct to reject the null hypothesis since it appears false. Now try myplot with an argument of 33.3.
 
-```{r}
+
+```r
 myplot(33.3)
 ```
 
+![](swirl-12-power_files/figure-html/unnamed-chunk-7-1.png) 
+
 This isn't as powerful as the test with mu_a=34 but it makes a pretty picture. Now try myplot with an argument of 30.
 
-```{r}
+
+```r
 myplot(30)
 ```
+
+![](swirl-12-power_files/figure-html/unnamed-chunk-8-1.png) 
 
 Uh Oh! Did the red curve disappear? No. it's just under the blue curve. The power now, the area under the blue curve to the right of the line, is exactly 5% or alpha!
 
@@ -191,29 +118,18 @@ Second, if mu_a is much bigger than mu_0=30 then the power (probability) is bigg
 
 Just for fun try myplot with an argument of 28.
 
-```{r}
+
+```r
 myplot(28)
 ```
+
+![](swirl-12-power_files/figure-html/unnamed-chunk-9-1.png) 
 
 We see that the blue curve has moved to the left of the red, so the area under it, to the right of the line, is less than the 5% under the red curve. This then is even less powerful and contradicts H_a so it's not worth looking at.
 
 Here's a picture of the power curves for different sample sizes. Again, this uses code "borrowed" from the slides. The alternative means, the mu_a's, are plotted along the horizontal axis and power along the vertical.
 
-```{r, echo=FALSE}
-nseq = c(8, 16, 32, 64, 128)
-mua = seq(30, 35, by = 0.1)
-power = sapply(nseq, function(n)
-  pnorm(mu0 + z * sigma / sqrt(n), mean = mua, sd = sigma / sqrt(n), 
-        lower.tail = FALSE)
-)
-colnames(power) <- paste("n", nseq, sep = "")
-d <- data.frame(mua, power)
-d2 <- melt(d, id.vars = "mua")
-names(d2) <- c("mua", "n", "power")    
-g <- ggplot(d2, 
-            aes(x = mua, y = power, col = n)) + geom_line(size = 2)
-print(g)
-```
+![](swirl-12-power_files/figure-html/unnamed-chunk-10-1.png) 
 
 What does the graph show us about mu_a?
 
@@ -235,23 +151,7 @@ Suppose we call pnorm with the quantile 30 + Z_95 * (sigma/sqrt(n)) and specify 
 
 Recall our picture of two distributions. 30 + Z_95 * (sigma/sqrt(n)) represents the point at which our vertical line falls. It's the point on the null distribution at the (1-alpha) level.
 
-```{r, echo=FALSE}
-mua <- 32
-mu0 <- 30
-sigma <- 4
-n <- 16
-alpha <- .05
-g = ggplot(data.frame(mu = c(27, 36)), aes(x = mu))
-g = g + stat_function(fun=dnorm, geom = "line", 
-                    args = list(mean = mu0, sd = sigma / sqrt(n)), 
-                    size = 2, col = "red")
-g = g + stat_function(fun=dnorm, geom = "line", 
-                    args = list(mean = mua, sd = sigma / sqrt(n)), 
-                    size = 2, col = "blue")
-xitc = mu0 + qnorm(1 - alpha) * sigma / sqrt(n)
-g = g + geom_vline(xintercept=xitc, size = 3)
-print(g)
-```
+![](swirl-12-power_files/figure-html/unnamed-chunk-11-1.png) 
 
 Study this picture. Calling pnorm with 30 + Z_95 * (sigma/sqrt(n)) as the quantile and mu_a, say 32, as the mean and lower.tail=FALSE does what?
 
@@ -274,37 +174,31 @@ z <- qnorm(.95)
 
 Run pnorm now with the quantile 30+z, mean=30, and lower.tail=FALSE. We've specified sigma and n so that the standard deviation of the sample mean is 1.
 
-```{r}
+
+```r
 pnorm(q = 30 + z, mean = 30, lower.tail = FALSE)
+```
+
+```
+## [1] 0.05
 ```
 
 That's not surprising, is it? With the mean set to mu_0 the two distributions, null and alternative, are the same and power=alpha. Now run pnorm now with the quantile 30+z, mean=32, and lower.tail=FALSE.
 
-```{r}
+
+```r
 pnorm(q = 30 + z, mean = 32, lower.tail = FALSE)
+```
+
+```
+## [1] 0.63876
 ```
 
 See how this is much more powerful? 64% as opposed to 5%. When the sample mean is quite different from (many standard errors greater than) the mean hypothesized by the null hypothesis, the probability of rejecting H_0 when it is false is much higher. That is power!
 
 Let's look again at the portly distributions.
 
-```{r, echo=FALSE}
-mua <- 32
-mu0 <- 30
-sigma_fat <-8
-n <- 16
-alpha <- .05
-g = ggplot(data.frame(mu = c(27, 36)), aes(x = mu))
-g = g + stat_function(fun=dnorm, geom = "line", 
-                    args = list(mean = mu0, sd = sigma_fat / sqrt(n)), 
-                    size = 2, col = "red")
-g = g + stat_function(fun=dnorm, geom = "line", 
-                    args = list(mean = mua, sd = sigma_fat / sqrt(n)), 
-                    size = 2, col = "blue")
-xitc = mu0 + qnorm(1 - alpha) * sigma_fat / sqrt(n)
-g = g + geom_vline(xintercept=xitc, size = 3)
-print(g)
-```
+![](swirl-12-power_files/figure-html/unnamed-chunk-14-1.png) 
 
 With this standard deviation=2 (fatter distribution) will power be greater or less than with the standard deviation=1?
 
@@ -316,14 +210,24 @@ less than
 
 To see this, run pnorm now with the quantile 30+z, mean=32 and sd=1. Don't forget to set lower.tail=FALSE so you get the right tail.
 
-```{r}
+
+```r
 pnorm(q = 30 + z, mean = 32, sd = 1, lower.tail = FALSE)
+```
+
+```
+## [1] 0.63876
 ```
 
 Now run pnorm now with the quantile 30+z*2, mean=32 and sd=2. Don't forget to set lower.tail=FALSE so you get the right tail.
 
-```{r}
+
+```r
 pnorm(q = 30 + z * 2, mean = 32, sd = 2, lower.tail = FALSE)
+```
+
+```
+## [1] 0.259511
 ```
 
 See the power drain from 64% to 26% ? Let's review some basic facts about power. We saw before in our pictures that the power of the test depends on mu_a. When H_a specifies that mu > mu_0, then as mu_a grows and exceeds mu_0 increasingly, what happens to power?
@@ -334,21 +238,7 @@ it increases
 
 Here's another question. Recall our power curves from before.
 
-```{r, echo=FALSE}
-nseq = c(8, 16, 32, 64, 128)
-mua = seq(30, 35, by = 0.1)
-power = sapply(nseq, function(n)
-  pnorm(mu0 + z * sigma / sqrt(n), mean = mua, sd = sigma / sqrt(n), 
-        lower.tail = FALSE)
-)
-colnames(power) <- paste("n", nseq, sep = "")
-d <- data.frame(mua, power)
-d2 <- melt(d, id.vars = "mua")
-names(d2) <- c("mua", "n", "power")    
-g <- ggplot(d2, 
-            aes(x = mua, y = power, col = n)) + geom_line(size = 2)
-print(g)
-```
+![](swirl-12-power_files/figure-html/unnamed-chunk-17-1.png) 
 
 As the sample size increases, what happens to power?
 
@@ -358,24 +248,7 @@ it increases
 
 Here's another one. More power curves.
 
-```{r, echo=FALSE}
-z <- qnorm(.95)
-mu0 <- 30
-n <- 16
-sigseq = c(8, 16, 32, 64, 128)
-mua = seq(30, 35, by = 0.1)
-power = sapply(sigseq, function(sigma)
-  pnorm(mu0 + z * sigma / sqrt(n), mean = mua, sd = sigma / sqrt(n), 
-        lower.tail = FALSE)
-)
-colnames(power) <- paste("sigma", sigseq, sep = "")
-d <- data.frame(mua, power)
-d2 <- melt(d, id.vars = "mua")
-names(d2) <- c("mua", "sigma", "power")    
-g <- ggplot(d2, 
-            aes(x = mua, y = power, col = sigma)) + geom_line(size = 2)
-print(g)
-```
+![](swirl-12-power_files/figure-html/unnamed-chunk-18-1.png) 
 
 As variance increases, what happens to power?
 
@@ -385,22 +258,7 @@ it decreases
 
 Here's another one. And even more power curves.
 
-```{r, echo=FALSE}
-alseq = c(.95, .9, .85, .8)
-mua = seq(30, 35, by = 0.1)
-z = lapply(alseq, qnorm)
-power = sapply(z, function(z)
-   pnorm(mu0 + z * sigma / sqrt(n), mean = mua, sd = sigma / sqrt(n), 
-        lower.tail = FALSE)
-)
-colnames(power) <- paste("alpha", 1-alseq, sep = "")
-d <- data.frame(mua, power)
-d2 <- melt(d, id.vars = "mua")
-names(d2) <- c("mua", "alpha", "power")    
-g <- ggplot(d2, 
-            aes(x = mua, y = power, col = alpha)) + geom_line(size = 2)
-print(g)
-```
+![](swirl-12-power_files/figure-html/unnamed-chunk-19-1.png) 
 
 As alpha increases, what happens to power?
 
@@ -454,52 +312,92 @@ We'll run it three times with the same values for n (16) and alpha (.05) but dif
 
 We'll specify a positive delta; this tells power.t.test that H_a proposes that mu > mu_0 and so we'll need a one-sided test. First run power.t.test(n = 16, delta = 2 / 4, sd=1, type = "one.sample", alt = "one.sided")$power .
 
-```{r}
+
+```r
 power.t.test(n = 16, delta = 2 / 4, sd = 1, type = "one.sample", alt = "one.sided")$power
+```
+
+```
+## [1] 0.6040329
 ```
 
 Now change delta to 2 and sd to 4. Keep everything else the same.
 
-```{r}
+
+```r
 power.t.test(n = 16, delta = 2, sd = 4, type = "one.sample", alt = "one.sided")$power
+```
+
+```
+## [1] 0.6040329
 ```
 
 Same answer, right? Now change delta to 100 and sd to 200. Keep everything else the same.
 
-```{r}
+
+```r
 power.t.test(n = 16, delta = 100, sd = 200, type = "one.sample", alt = "one.sided")$power
+```
+
+```
+## [1] 0.6040329
 ```
 
 So keeping the effect size (the ratio delta/sd) constant preserved the power. Let's try a similar experiment except now we'll specify a power we want and solve for the sample size n.
 
 First run power.t.test(power = .8, delta = 2 / 4, sd = 1, type = "one.sample", alt = "one.sided")$n.
 
-```{r}
+
+```r
 power.t.test(power = .8, delta = 2 / 4, sd = 1, type = "one.sample", alt = "one.sided")$n
+```
+
+```
+## [1] 26.13751
 ```
 
 Now change delta to 2 and sd to 4. Keep everything else the same.
 
-```{r}
+
+```r
 power.t.test(power = .8, delta = 2, sd = 4, type = "one.sample", alt = "one.sided")$n
+```
+
+```
+## [1] 26.13751
 ```
 
 Same answer, right? Now change delta to 100 and sd to 200. Keep everything else the same.
 
-```{r}
+
+```r
 power.t.test(power = .8, delta = 100, sd = 200, type = "one.sample", alt = "one.sided")$n
+```
+
+```
+## [1] 26.13751
 ```
 
 Now use power.t.test to find delta for a power=.8 and n=26 and sd=1
 
-```{r}
+
+```r
 power.t.test(power = .8, n = 26, sd = 1, type = "one.sample", alt = "one.sided")$delta
+```
+
+```
+## [1] 0.5013986
 ```
 
 Not a surprising result, is it? It told you before that with an effect size of .5 and power .8, you need a sample size a little more than 26. Now run it with n=27.
 
-```{r}
+
+```r
 power.t.test(power = .8, n = 27, sd = 1, type = "one.sample", alt = "one.sided")$delta
+```
+
+```
+## [1] 0.4914855
 ```
 
 What do you think will happen if you doubled sd to 2 and ran the same test?
